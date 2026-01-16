@@ -12,9 +12,6 @@
         <dependent-module archiveName="commons-domain-0.3.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/commons-domain/commons-domain">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="ArcCore-1.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ArcCore/ArcCore">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
                 
         <property name="context-root" value="ws-rest"/>
                 
