@@ -876,7 +876,7 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 
 		// Datos de conexion
 //		String url = "jdbc:sqlserver://;serverName=vm-sap;port=1433;databaseName=Pruebas2_Premec";
-		String url = "jdbc:sqlserver://;serverName=vm-sap;port=1433;databaseName=AR_PRD_PREMEC";
+		String url = "jdbc:sqlserver://;serverName=vm-sap;port=1433;databaseName=AR_PRD_PREMEC;encrypt=true;trustServerCertificate=true";
 		String user = "sa";
 		String password = "SAPB1Admin";
 
