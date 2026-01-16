@@ -18,6 +18,9 @@
 
 	<aop:aspectj-autoproxy />
 
+	<component-scan base-package="ar.com.avaco.ws.handler"
+		resource-pattern="**/*Handler.class" />
+
 	<component-scan
 		base-package="ar.com.avaco.ws.rest.security"
 		resource-pattern="**/*.class" />

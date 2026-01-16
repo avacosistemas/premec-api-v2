@@ -7,7 +7,7 @@ import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.commons.exception.ErrorValidationException;
 import ar.com.avaco.ws.rest.security.dto.UpdatePasswordDTO;
 import ar.com.avaco.ws.rest.security.dto.User;
-import ar.com.avaco.ws.rest.service.ConvertService;
+import ar.com.avaco.ws.service.ConvertService;
 
 /**
  * @author avaco

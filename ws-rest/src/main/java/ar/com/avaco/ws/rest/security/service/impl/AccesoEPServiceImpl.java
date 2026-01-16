@@ -19,7 +19,7 @@ import ar.com.avaco.arc.sec.service.UsuarioService;
 import ar.com.avaco.service.cliente.AccesoService;
 import ar.com.avaco.ws.rest.security.dto.AccesoDTO;
 import ar.com.avaco.ws.rest.security.service.AccesoEPService;
-import ar.com.avaco.ws.rest.service.CRUDEPBaseService;
+import ar.com.avaco.ws.service.CRUDEPBaseService;
 
 /**
  * @author avaco

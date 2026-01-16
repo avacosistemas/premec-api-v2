@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.h2.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -232,7 +232,7 @@ public class InformeBuilderPiezasRepararMantenimientoMaquinaria extends InformeB
 		PdfPTable tableBorder = new PdfPTable(1);
 		tableBorder.setWidthPercentage(100);
 		PdfPCell cellBorder = new PdfPCell();
-		if (!StringUtils.isNullOrEmpty(titulo))
+		if (!StringUtils.isBlank(titulo))
 			if (blue)
 				cellBorder.addElement(addHeaderBlue(titulo, 0));
 			else

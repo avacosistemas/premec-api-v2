@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import ar.com.avaco.ws.rest.dto.JSONResponse;
-import ar.com.avaco.ws.rest.service.FunctionBusiness;
+import ar.com.avaco.ws.service.FunctionBusiness;
 
 public abstract class AbstractRestBaseController {
 

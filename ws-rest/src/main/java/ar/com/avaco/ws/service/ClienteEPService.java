@@ -6,7 +6,6 @@ import ar.com.avaco.commons.exception.BusinessException;
 import ar.com.avaco.commons.exception.ErrorValidationException;
 import ar.com.avaco.ws.dto.ClienteDTO;
 import ar.com.avaco.ws.dto.ContactoDTO;
-import ar.com.avaco.ws.rest.service.CRUDEPService;
 
 public interface ClienteEPService extends CRUDEPService<Long, ClienteDTO> {
 

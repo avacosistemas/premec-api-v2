@@ -16,7 +16,7 @@ import ar.com.avaco.entities.cliente.Provincia;
 import ar.com.avaco.service.cliente.ClienteService;
 import ar.com.avaco.ws.dto.ClienteDTO;
 import ar.com.avaco.ws.dto.ContactoDTO;
-import ar.com.avaco.ws.rest.service.CRUDEPBaseService;
+import ar.com.avaco.ws.service.CRUDEPBaseService;
 import ar.com.avaco.ws.service.ClienteEPService;
 
 @Service("clienteEPService")

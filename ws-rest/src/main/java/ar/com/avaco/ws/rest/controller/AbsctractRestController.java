@@ -17,8 +17,8 @@ import ar.com.avaco.arc.core.domain.Entity;
 import ar.com.avaco.commons.exception.BusinessException;
 import ar.com.avaco.ws.rest.dto.ErrorResponse;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
-import ar.com.avaco.ws.rest.service.FunctionBusiness;
-import ar.com.avaco.ws.rest.service.SupplierBusiness;
+import ar.com.avaco.ws.service.FunctionBusiness;
+import ar.com.avaco.ws.service.SupplierBusiness;
 
 /**
  * @author avaco

@@ -12,7 +12,7 @@ import ar.com.avaco.arc.sec.domain.Permiso;
 import ar.com.avaco.arc.sec.service.PermisoService;
 import ar.com.avaco.ws.rest.security.dto.Permission;
 import ar.com.avaco.ws.rest.security.service.PermissionService;
-import ar.com.avaco.ws.rest.service.AbstractConvertService;
+import ar.com.avaco.ws.service.AbstractConvertService;
 
 /**
  * @author avaco

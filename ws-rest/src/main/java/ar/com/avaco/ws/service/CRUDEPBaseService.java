@@ -1,4 +1,4 @@
-package ar.com.avaco.ws.rest.service;
+package ar.com.avaco.ws.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;

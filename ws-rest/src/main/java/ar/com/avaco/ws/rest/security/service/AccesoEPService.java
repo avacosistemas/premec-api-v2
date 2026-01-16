@@ -6,7 +6,7 @@ package ar.com.avaco.ws.rest.security.service;
 import java.util.List;
 
 import ar.com.avaco.ws.rest.security.dto.AccesoDTO;
-import ar.com.avaco.ws.rest.service.CRUDEPService;
+import ar.com.avaco.ws.service.CRUDEPService;
 
 /**
  * @author avaco

@@ -23,7 +23,7 @@ import ar.com.avaco.ws.rest.security.dto.UpdatePasswordDTO;
 import ar.com.avaco.ws.rest.security.dto.User;
 import ar.com.avaco.ws.rest.security.service.ProfileService;
 import ar.com.avaco.ws.rest.security.service.UserService;
-import ar.com.avaco.ws.rest.service.AbstractConvertService;
+import ar.com.avaco.ws.service.AbstractConvertService;
 
 /**
  * @author avaco

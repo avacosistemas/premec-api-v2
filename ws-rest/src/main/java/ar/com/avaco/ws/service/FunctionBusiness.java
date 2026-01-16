@@ -1,4 +1,4 @@
-package ar.com.avaco.ws.rest.service;
+package ar.com.avaco.ws.service;
 import ar.com.avaco.commons.exception.BusinessException;
 
 /**

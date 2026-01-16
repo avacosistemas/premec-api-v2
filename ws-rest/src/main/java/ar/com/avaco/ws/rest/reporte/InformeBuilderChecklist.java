@@ -1,6 +1,7 @@
 package ar.com.avaco.ws.rest.reporte;
 
-import java.io.File;
+import java.io.File
+;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -11,7 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.h2.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -149,7 +150,7 @@ public class InformeBuilderChecklist extends InformeBuilder {
 		PdfPTable tableBorder = new PdfPTable(1);
 		tableBorder.setWidthPercentage(100);
 		PdfPCell cellBorder = new PdfPCell();
-		if (!StringUtils.isNullOrEmpty(titulo))
+		if (!StringUtils.isBlank(titulo))
 			if (blue)
 				cellBorder.addElement(addHeaderBlue(titulo, 0));
 			else
@@ -239,7 +240,7 @@ public class InformeBuilderChecklist extends InformeBuilder {
 		PdfPTable tableBorder = new PdfPTable(1);
 		tableBorder.setWidthPercentage(100);
 		PdfPCell cellBorder = new PdfPCell();
-		if (!StringUtils.isNullOrEmpty(titulo))
+		if (!StringUtils.isBlank(titulo))
 			if (blue)
 				cellBorder.addElement(addHeaderBlue(titulo, 0));
 			else

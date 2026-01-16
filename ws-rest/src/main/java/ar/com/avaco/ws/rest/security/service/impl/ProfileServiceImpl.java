@@ -21,7 +21,7 @@ import ar.com.avaco.ws.rest.security.dto.Role;
 import ar.com.avaco.ws.rest.security.service.PermissionService;
 import ar.com.avaco.ws.rest.security.service.ProfileService;
 import ar.com.avaco.ws.rest.security.service.RoleService;
-import ar.com.avaco.ws.rest.service.AbstractConvertService;
+import ar.com.avaco.ws.service.AbstractConvertService;
 
 /**
  * @author avaco

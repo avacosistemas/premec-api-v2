@@ -8,7 +8,7 @@ import ar.com.avaco.commons.domain.GrupoTipoActividad;
 import ar.com.avaco.commons.domain.ItemChecklistGrupo;
 import ar.com.avaco.commons.service.ItemCheckListGrupoService;
 import ar.com.avaco.ws.dto.formulario.ItemChecklistGrupoDTO;
-import ar.com.avaco.ws.rest.service.CRUDEPBaseService;
+import ar.com.avaco.ws.service.CRUDEPBaseService;
 import ar.com.avaco.ws.service.ItemChecklistGrupoEPService;
 
 @Service("itemChecklistGrupoEPService")

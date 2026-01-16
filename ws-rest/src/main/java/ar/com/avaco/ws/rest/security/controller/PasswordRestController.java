@@ -21,7 +21,7 @@ import ar.com.avaco.ws.rest.dto.JSONResponse;
 import ar.com.avaco.ws.rest.security.dto.PassworResetDTO;
 import ar.com.avaco.ws.rest.security.dto.UpdatePasswordDTO;
 import ar.com.avaco.ws.rest.security.service.UserService;
-import ar.com.avaco.ws.rest.service.FunctionBusiness;
+import ar.com.avaco.ws.service.FunctionBusiness;
 
 @RestController
 public class PasswordRestController {

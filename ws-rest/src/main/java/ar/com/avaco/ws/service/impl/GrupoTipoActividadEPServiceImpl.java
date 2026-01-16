@@ -9,7 +9,7 @@ import ar.com.avaco.commons.domain.TipoActividad;
 import ar.com.avaco.commons.service.GrupoTipoActividadService;
 import ar.com.avaco.ws.dto.formulario.GrupoTipoActividadDTO;
 import ar.com.avaco.ws.dto.formulario.ItemChecklistGrupoDTO;
-import ar.com.avaco.ws.rest.service.CRUDEPBaseService;
+import ar.com.avaco.ws.service.CRUDEPBaseService;
 import ar.com.avaco.ws.service.GrupoTipoActividadEPService;
 
 @Service("grupoTipoActividadEPService")

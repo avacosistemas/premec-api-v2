@@ -12,7 +12,7 @@ import ar.com.avaco.arc.sec.domain.Rol;
 import ar.com.avaco.arc.sec.service.RolService;
 import ar.com.avaco.ws.rest.security.dto.Role;
 import ar.com.avaco.ws.rest.security.service.RoleService;
-import ar.com.avaco.ws.rest.service.AbstractConvertService;
+import ar.com.avaco.ws.service.AbstractConvertService;
 
 /**
  * @author avaco
