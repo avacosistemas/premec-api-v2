@@ -7,10 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -25,6 +27,7 @@ import com.google.common.collect.Lists;
 
 import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.arc.sec.repository.UsuarioRepository;
+import ar.com.avaco.arc.sec.service.impl.UsuarioServiceImpl;
 import ar.com.avaco.ws.dto.actividad.HorasPorEmpleadoDTO;
 import ar.com.avaco.ws.dto.actividad.RegistroPreviewEmpleadoMensualDTO;
 import ar.com.avaco.ws.dto.employee.liquidacion.FueraConvenio;
@@ -52,9 +55,8 @@ public class ActivityServiceImpl extends AbstractSapService implements ActivityS
 		return obtenerActividadesValoradas(fechaDesde, fechaHasta, exclusiones, null, true);
 	}
 	
-	@Override
-	public List<RegistroPreviewEmpleadoMensualDTO> obtenerActividadesValoradas(String fechaDesde, String fechaHasta, String exclusiones, 
-			String usuarioSap, boolean agrupadas) {
+	private List<RegistroPreviewEmpleadoMensualDTO> obtenerActividadesValoradas(String fechaDesde, String fechaHasta, String exclusiones, 
+			List<Long> idsUsuariosSap, boolean agrupadas) {
 
 		List<Usuario> usuarios = usuarioRepository.findAll();
 
@@ -95,8 +97,9 @@ public class ActivityServiceImpl extends AbstractSapService implements ActivityS
 			   .append(" LEFT JOIN TSH1 det ON cab.AbsEntry = det.AbsEntry ")
 			   .append(" INNER JOIN OHEM E ON cab.UserID = E.empID ");
 			   
-			if (usuarioSap != null) {
-				sql.append(" and cab.UserID = {usuarioSap} ".replace("{usuarioSap}", usuarioSap));
+			if (idsUsuariosSap != null && !idsUsuariosSap.isEmpty()) {
+				String idsUsuarioSapString = idsUsuariosSap.stream().map(String::valueOf).collect(Collectors.joining(","));
+				sql.append(" and cab.UserID = {usuarioSap} ".replace("{usuarioSap}", idsUsuarioSapString));
 			}
 			   
 			sql.append(" LEFT JOIN ( ")
@@ -531,6 +534,25 @@ public class ActivityServiceImpl extends AbstractSapService implements ActivityS
 	@Resource(name = "usuarioRepository")
 	public void setUsuarioRepository(UsuarioRepository usuarioRepository) {
 		this.usuarioRepository = usuarioRepository;
+	}
+
+	@Override
+	public List<RegistroPreviewEmpleadoMensualDTO> getRegistrosCierre(String fechaDesde, String fechaHasta,
+			String exclusionesActividadesCalculoHorasNetas, String usuarioSap) {
+		List<Long> idsUsuariosSap = Arrays.asList(Long.parseLong(usuarioSap));
+		return obtenerActividadesValoradas(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, idsUsuariosSap, true);
+	}
+
+	@Override
+	public List<RegistroPreviewEmpleadoMensualDTO> obtenerIndicadoresPorGrupoEmpleado(String fechaDesde,
+			String fechaHasta, String exclusionesActividadesCalculoHorasNetas, List<Long> idUsuariosSap) {
+		return obtenerActividadesValoradas(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, idUsuariosSap, true);
+	}
+
+	@Override
+	public List<RegistroPreviewEmpleadoMensualDTO> obtenerIndicadoresPorEmpleados(String fechaDesde, String fechaHasta,
+			String exclusionesActividadesCalculoHorasNetas, List<Long> idUsuariosSap) {
+		return obtenerActividadesValoradas(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, idUsuariosSap, false);
 	}
 
 }

@@ -59,6 +59,8 @@ public interface UsuarioService extends NJService<Long, Usuario> {
 	String getUsuarioSAPByLegajo(int legajo);
 
 	String getUsuarioSAP(String username);
+
+	List<Usuario> getByIds(List<Long> lista);
 	
 }
 

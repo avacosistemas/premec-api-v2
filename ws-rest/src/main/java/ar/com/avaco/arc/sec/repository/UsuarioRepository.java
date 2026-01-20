@@ -17,5 +17,7 @@ public interface UsuarioRepository extends NJRepository<Long, Usuario>, UsuarioR
 	List<Usuario> findByLegajoIn(List<String> legajos);
 
 	Usuario findByLegajo(int legajo);
+
+	List<Usuario> findByIdIn(List<Long> lista);
 		
 }

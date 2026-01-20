@@ -293,4 +293,9 @@ public class UsuarioServiceImpl extends NJBaseService<Long, Usuario, UsuarioRepo
 		}
 	}
 
+	@Override
+	public List<Usuario> getByIds(List<Long> lista) {
+		return this.repository.findByIdIn(lista);
+	}
+
 }

@@ -1,15 +1,16 @@
 package ar.com.avaco.ws.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,7 +18,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ibm.icu.util.Calendar;
 
+import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.premec.domain.GrupoEmpleado;
+import ar.com.avaco.premec.service.GrupoEmpleadoService;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.actividad.RegistroPreviewEmpleadoMensualDTO;
 import ar.com.avaco.ws.dto.timesheet.ProjectManagementTimeSheetGetDTO;
@@ -41,6 +45,9 @@ public class CierreMesServiceImpl extends AbstractSapService implements CierreMe
 	@Autowired
 	private UsuarioService usuarioService;
 
+	@Autowired
+	private GrupoEmpleadoService grupoEmpleadoService;
+	
 	@Override
 	public List<RegistroPreviewEmpleadoMensualDTO> getRegistrosCierre(String mes, String anio) {
 
@@ -59,7 +66,7 @@ public class CierreMesServiceImpl extends AbstractSapService implements CierreMe
 	}
 
 	@Override
-	public RegistroPreviewEmpleadoMensualDTO getRegistrosCierre(String mes, String anio, String usuario) {
+	public RegistroPreviewEmpleadoMensualDTO getRegistrosCierreIndividual(String mes, String anio, String usuario) {
 		
 		String usuarioSap = usuarioService.getUsuarioSAPByUsername(usuario);
 		
@@ -72,7 +79,7 @@ public class CierreMesServiceImpl extends AbstractSapService implements CierreMe
 		String fechaHasta = DateUtils.toString(fecha.getTime(), "yyyyMMdd");
 		
 		List<RegistroPreviewEmpleadoMensualDTO> resumenPreview = this.activityService
-				.obtenerActividadesValoradas(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, usuarioSap, true);
+				.getRegistrosCierre(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, usuarioSap);
 		
 		return resumenPreview.get(0);
 	}
@@ -138,7 +145,7 @@ public class CierreMesServiceImpl extends AbstractSapService implements CierreMe
 	}
 
 	@Override
-	public RegistroPreviewEmpleadoMensualDTO getRegistrosCierreSinAgrupar(String mes, String anio) {
+	public RegistroPreviewEmpleadoMensualDTO getRegistrosCierreGeneral(String mes, String anio) {
 		String fechaDesde = anio + StringUtils.leftPad(mes, 2, "0") + "01";
 
 		Calendar fecha = Calendar.getInstance();
@@ -152,5 +159,55 @@ public class CierreMesServiceImpl extends AbstractSapService implements CierreMe
 
 		return resumenPreview.get(0);
 	}
+
+	@Override
+	public RegistroPreviewEmpleadoMensualDTO getRegistrosCierreGrupoEmpleado(String mes, String anio,
+			Long idGrupoEmpleado) {
+
+		GrupoEmpleado grupoEmpleado = grupoEmpleadoService.get(idGrupoEmpleado);
+		
+		List<Long> idUsuariosSap = grupoEmpleado.getUsuarios().stream().map(Usuario::getUsuariosap).map(Long::valueOf).collect(Collectors.toList());
+		
+		String fechaDesde = anio + StringUtils.leftPad(mes, 2, "0") + "01";
+		
+		Calendar fecha = Calendar.getInstance();
+		fecha.setTime(DateUtils.toDate(fechaDesde, "yyyyMMdd"));
+		fecha.add(Calendar.MONTH, 1);
+		fecha.add(Calendar.DAY_OF_MONTH, -1);
+		String fechaHasta = DateUtils.toString(fecha.getTime(), "yyyyMMdd");
+		
+		List<RegistroPreviewEmpleadoMensualDTO> resumenPreview = this.activityService
+				.obtenerIndicadoresPorGrupoEmpleado(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, idUsuariosSap);
+		
+		return resumenPreview.get(0);
+	
+	}
+
+	@Override
+	public List<RegistroPreviewEmpleadoMensualDTO> getRegistrosCierreEmpleados(String mes, String anio,
+			String idsEmpleados) {
+
+		List<Long> lista = Arrays.stream(idsEmpleados.split(","))
+		        .map(Long::valueOf)
+		        .collect(Collectors.toList());
+		
+		List<Usuario> usuarios = usuarioService.getByIds(lista);
+		
+		List<Long> idUsuariosSap = usuarios.stream().map(Usuario::getUsuariosap).map(Long::valueOf).collect(Collectors.toList());
+		
+		String fechaDesde = anio + StringUtils.leftPad(mes, 2, "0") + "01";
+		
+		Calendar fecha = Calendar.getInstance();
+		fecha.setTime(DateUtils.toDate(fechaDesde, "yyyyMMdd"));
+		fecha.add(Calendar.MONTH, 1);
+		fecha.add(Calendar.DAY_OF_MONTH, -1);
+		String fechaHasta = DateUtils.toString(fecha.getTime(), "yyyyMMdd");
+		
+		List<RegistroPreviewEmpleadoMensualDTO> resumenPreview = this.activityService
+				.obtenerIndicadoresPorEmpleados(fechaDesde, fechaHasta, exclusionesActividadesCalculoHorasNetas, idUsuariosSap);
+		
+		return resumenPreview;
+	}
+
 
 }

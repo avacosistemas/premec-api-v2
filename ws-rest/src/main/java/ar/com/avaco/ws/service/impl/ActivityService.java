@@ -18,10 +18,17 @@ public interface ActivityService {
 
 	PlantillaData getPreviewNovedadesContador(String anio, String mes);
 
-	List<RegistroPreviewEmpleadoMensualDTO> obtenerActividadesValoradas(String fechaDesde, String fechaHasta,
-			String exclusiones, String usuarioSap, boolean agrupadas);
 
 	List<RegistroPreviewEmpleadoMensualDTO> obtenerActividadesValoradasSinAgrupar(String fechaDesde, String fechaHasta,
 			String exclusionesActividadesCalculoHorasNetas);
+
+	List<RegistroPreviewEmpleadoMensualDTO> getRegistrosCierre(String fechaDesde, String fechaHasta,
+			String exclusionesActividadesCalculoHorasNetas, String usuarioSap);
+
+	List<RegistroPreviewEmpleadoMensualDTO> obtenerIndicadoresPorGrupoEmpleado(String fechaDesde, String fechaHasta,
+			String exclusionesActividadesCalculoHorasNetas, List<Long> idUsuariosSap);
+
+	List<RegistroPreviewEmpleadoMensualDTO> obtenerIndicadoresPorEmpleados(String fechaDesde, String fechaHasta,
+			String exclusionesActividadesCalculoHorasNetas, List<Long> idUsuariosSap);
 
 }

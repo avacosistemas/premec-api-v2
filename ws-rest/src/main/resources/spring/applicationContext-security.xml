@@ -35,12 +35,27 @@
 	    <csrf disabled="true"/>
 	
 	    <!-- Públicos -->
-	    <intercept-url pattern="/auth/**" access="permitAll"/>
-	
+	    <intercept-url pattern="/auth/**" access="permitAll" />
+		<intercept-url pattern="/monitor" method="GET" access="permitAll" />
+		
+		<intercept-url pattern="/formulario" method="POST" access="permitAll" />
+		<intercept-url pattern="/formulariosEnviarJsonSap" method="POST" access="permitAll" />
+		<intercept-url pattern="/quitarArchivoColaEnvio" method="GET" access="permitAll" />
+		<intercept-url pattern="/validarHorasMaquina" method="GET" access="permitAll" />
+		
+		<!-- Swagger -->
+		<intercept-url pattern="/swagger-ui.html" access="permitAll" />
+		<intercept-url pattern="/swagger-ui/**" access="permitAll" />
+		<intercept-url pattern="/v3/api-docs" access="permitAll" />
+		<intercept-url pattern="/v3/api-docs/**" access="permitAll" />
+		<intercept-url pattern="/swagger-resources/**" access="permitAll" />
+		<intercept-url pattern="/webjars/**" access="permitAll" />
+		<intercept-url pattern="/v2/api-docs" access="permitAll" />
+		
 	    <!-- Protegidos -->
-	    <intercept-url pattern="/auth/reset-password" access="isAuthenticated()"/>
-	    <intercept-url pattern="/actividades" method="GET" access="isAuthenticated()"/>
-	    <intercept-url pattern="/formulario" method="POST" access="isAuthenticated()"/>
+	    <intercept-url pattern="/auth/reset-password" access="isAuthenticated()" />
+	    <intercept-url pattern="/actividades" method="GET" access="isAuthenticated()" />
+	    <intercept-url pattern="/formulario" method="POST" access="isAuthenticated()" />
 	
 	    <!-- Default -->
 	    <intercept-url pattern="/**" access="isAuthenticated()"/>
@@ -67,6 +82,8 @@
 		base-package="ar.com.avaco.ws.rest.security.controller" />
 	<ctx:component-scan
 		base-package="ar.com.avaco.ws.rest.controller" />
+	<ctx:component-scan
+		base-package="ar.com.avaco.premec.ws.controller" />
 	<ctx:component-scan
 		base-package="ar.com.avaco.ws.rest.security.handler" />
 	<ctx:component-scan

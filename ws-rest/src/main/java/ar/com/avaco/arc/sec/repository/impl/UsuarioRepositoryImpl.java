@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import ar.com.avaco.arc.core.component.bean.repository.NJBaseRepository;
 import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.arc.sec.repository.UsuarioRepository;
+import ar.com.avaco.arc.sec.repository.UsuarioRepositoryCustom;
 
 @Repository("usuarioRepository")
 public class UsuarioRepositoryImpl extends NJBaseRepository<Long, Usuario> implements UsuarioRepository {
@@ -94,6 +95,13 @@ public class UsuarioRepositoryImpl extends NJBaseRepository<Long, Usuario> imple
 		Criteria c = this.getCurrentSession().createCriteria(this.getHandledClass());
 		c.add(Restrictions.eq("legajo", legajo));
 		return (Usuario) c.uniqueResult();
+	}
+
+	@Override
+	public List<Usuario> findByIdIn(List<Long> lista) {
+		Criteria c = this.getCurrentSession().createCriteria(this.getHandledClass());
+		c.add(Restrictions.in("id", lista));
+		return c.list();
 	}
 
 }
