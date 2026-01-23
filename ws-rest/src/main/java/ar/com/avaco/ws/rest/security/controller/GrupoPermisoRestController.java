@@ -51,8 +51,11 @@ public class GrupoPermisoRestController {
 	}
 
 	@RequestMapping(value = "/grupoPermiso/idGrupo/{idGrupo}/id/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<JSONResponse> delete(@PathVariable("idGrupo") Long idGrupo, @PathVariable("id") Long idPermiso) throws BusinessException {
-		this.perfilService.quitarPermisoAPerfil(idGrupo, idPermiso);
+	public ResponseEntity<JSONResponse> delete(@PathVariable("idGrupo") Long idGrupo, @PathVariable("id") String idPermiso) throws BusinessException {
+		String[] split = idPermiso.split(",");
+		for (String id : split) {
+			this.perfilService.quitarPermisoAPerfil(idGrupo, Long.parseLong(id));
+		}
 		JSONResponse response = new JSONResponse();
 		response.setData(true);
 		return new ResponseEntity<JSONResponse>(response, HttpStatus.OK);
