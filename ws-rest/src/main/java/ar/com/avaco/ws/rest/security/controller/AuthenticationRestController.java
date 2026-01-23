@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,9 +47,23 @@ public class AuthenticationRestController {
 	private UserService userService;
 
 	@RequestMapping(value = "/auth", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest)
-			throws AuthenticationException {
-		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+	public ResponseEntity<JwtAuthenticationResponse> createAuthenticationToken(
+			@RequestBody JwtAuthenticationRequest authenticationRequest) throws AuthenticationException {
+
+		try {
+			authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+		} catch (CredentialsExpiredException ex) {
+
+			// Usuario y password son válidos, solo vencidos
+			UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+
+			String token = jwtTokenUtil.generatePasswordExpiredToken(userDetails);
+
+			User usuario = userService.getByUsername(userDetails.getUsername());
+
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(new JwtAuthenticationResponse(token, usuario, true));
+
+		}
 
 		// Reload password post-security so we can generate the token
 		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
@@ -60,7 +72,7 @@ public class AuthenticationRestController {
 		User usuario = userService.getByUsername(userDetails.getUsername());
 
 		// Return the token and user datas
-		return ResponseEntity.ok(new JwtAuthenticationResponse(token, usuario));
+		return ResponseEntity.ok(new JwtAuthenticationResponse(token, usuario, false));
 	}
 
 	@RequestMapping(value = "/authAdmin", method = RequestMethod.POST)
@@ -78,7 +90,7 @@ public class AuthenticationRestController {
 					null);
 		}
 		// Return the token and user datas
-		return ResponseEntity.ok(new JwtAuthenticationResponse(token, usuario));
+		return ResponseEntity.ok(new JwtAuthenticationResponse(token, usuario, false));
 	}
 
 	@RequestMapping(value = "/refresh", method = RequestMethod.POST)
@@ -92,7 +104,7 @@ public class AuthenticationRestController {
 
 		if (jwtTokenUtil.canTokenBeRefreshed(token, user.getFechaAltaPassword())) {
 			String refreshedToken = jwtTokenUtil.refreshToken(token);
-			return ResponseEntity.ok(new JwtAuthenticationResponse(refreshedToken, usuario));
+			return ResponseEntity.ok(new JwtAuthenticationResponse(refreshedToken, usuario, false));
 		} else {
 			return ResponseEntity.badRequest().body(null);
 		}
@@ -126,17 +138,9 @@ public class AuthenticationRestController {
 	private void authenticate(String username, String password) {
 		Objects.requireNonNull(username);
 		Objects.requireNonNull(password);
-
-		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		} catch (DisabledException e) {
-			throw new AuthenticationException("User is disabled!", e);
-		} catch (BadCredentialsException e) {
-			throw new AuthenticationException("Bad credentials!", e);
-		}
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 	}
 
-	
 //	public void setJwtTokenUtilManager(JwtTokenUtil jwtTokenUtil) {
 //		this.jwtTokenUtil = jwtTokenUtil;
 //	}

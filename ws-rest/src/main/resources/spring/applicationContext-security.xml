@@ -42,6 +42,7 @@
 		<intercept-url pattern="/formulariosEnviarJsonSap" method="POST" access="permitAll" />
 		<intercept-url pattern="/quitarArchivoColaEnvio" method="GET" access="permitAll" />
 		<intercept-url pattern="/validarHorasMaquina" method="GET" access="permitAll" />
+		<intercept-url pattern="/password/reset" access="permitAll" />
 		
 		<!-- Swagger -->
 		<intercept-url pattern="/swagger-ui.html" access="permitAll" />
@@ -51,6 +52,9 @@
 		<intercept-url pattern="/swagger-resources/**" access="permitAll" />
 		<intercept-url pattern="/webjars/**" access="permitAll" />
 		<intercept-url pattern="/v2/api-docs" access="permitAll" />
+
+
+		
 		
 	    <!-- Protegidos -->
 	    <intercept-url pattern="/auth/reset-password" access="isAuthenticated()" />

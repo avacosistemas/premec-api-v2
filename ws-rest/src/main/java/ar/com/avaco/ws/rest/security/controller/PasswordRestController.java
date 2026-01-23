@@ -1,7 +1,5 @@
 package ar.com.avaco.ws.rest.security.controller;
 
-import java.security.Security;
-
 import javax.annotation.Resource
 ;
 import javax.servlet.http.HttpServletRequest;
@@ -15,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.avaco.commons.exception.BusinessException;
 import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.commons.exception.BusinessException;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
 import ar.com.avaco.ws.rest.security.dto.PassworResetDTO;
 import ar.com.avaco.ws.rest.security.dto.UpdatePasswordDTO;
@@ -48,7 +46,7 @@ public class PasswordRestController {
 		return new ResponseEntity<JSONResponse>(jsonResponse, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/password/update/", method = RequestMethod.POST)
+	@RequestMapping(value = "/password/update", method = RequestMethod.POST)
     public  ResponseEntity<JSONResponse> resetPassword(HttpServletRequest request, @RequestBody UpdatePasswordDTO updatePassword) throws BusinessException {
     	String name = SecurityContextHolder.getContext().getAuthentication().getName();
     	updatePassword.setUsername(name);

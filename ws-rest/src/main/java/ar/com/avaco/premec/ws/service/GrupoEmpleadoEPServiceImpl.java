@@ -1,6 +1,7 @@
 package ar.com.avaco.premec.ws.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -23,15 +24,21 @@ public class GrupoEmpleadoEPServiceImpl
 
 	@Autowired
 	private UsuarioService usuarioService;
-	
+
 	@Override
 	public List<UsuarioDTO> listUsuarios() {
 		List<Usuario> usrs = this.usuarioService.list();
 		List<UsuarioDTO> usrdtolist = new ArrayList<UsuarioDTO>();
-		usrs.stream().forEach(x -> usrdtolist.add(new UsuarioDTO(x.getId(), x.getNombreApellidoUsername())));
+		usrs.stream().forEach(x -> usrdtolist.add(new UsuarioDTO(x.getId(), x.getNombreApellido())));
+		usrdtolist.sort(new Comparator<UsuarioDTO>() {
+			@Override
+			public int compare(UsuarioDTO o1, UsuarioDTO o2) {
+				return o1.getUsuario().compareTo(o2.getUsuario());
+			}
+		});
 		return usrdtolist;
 	}
-	
+
 	@Override
 	@Resource(name = "grupoEmpleadoService")
 	protected void setService(GrupoEmpleadoService service) {

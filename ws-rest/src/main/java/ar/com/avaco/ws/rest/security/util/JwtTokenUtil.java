@@ -20,108 +20,100 @@ import io.jsonwebtoken.impl.DefaultClock;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    static final String CLAIM_KEY_USERNAME = "sub";
-    static final String CLAIM_KEY_CREATED = "iat";
-    private static final long serialVersionUID = -3301605591108950415L;
-    
-    private Clock clock = DefaultClock.INSTANCE;
+	static final String CLAIM_KEY_USERNAME = "sub";
+	static final String CLAIM_KEY_CREATED = "iat";
+	private static final long serialVersionUID = -3301605591108950415L;
 
-    @Value("${jwt.secret}")
-    private String secret;
+	private Clock clock = DefaultClock.INSTANCE;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+	@Value("${jwt.secret}")
+	private String secret;
 
-    public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject);
-    }
+	@Value("${jwt.expiration}")
+	private Long expiration;
 
-    
-    public Date getIssuedAtDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getIssuedAt);
-    }
+	public String getUsernameFromToken(String token) {
+		return getClaimFromToken(token, Claims::getSubject);
+	}
 
-    public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
-    }
+	public Date getIssuedAtDateFromToken(String token) {
+		return getClaimFromToken(token, Claims::getIssuedAt);
+	}
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
-    }
-         
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
-            .setSigningKey(secret)
-            .parseClaimsJws(token)
-            .getBody();
-    }
+	public Date getExpirationDateFromToken(String token) {
+		return getClaimFromToken(token, Claims::getExpiration);
+	}
 
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(clock.now());
-    }
+	public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+		final Claims claims = getAllClaimsFromToken(token);
+		return claimsResolver.apply(claims);
+	}
 
-    private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
-        return (lastPasswordReset != null && created.before(lastPasswordReset));
-    }
+	private Claims getAllClaimsFromToken(String token) {
+		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+	}
 
-    private Boolean ignoreTokenExpiration(String token) {
-        // here you specify tokens, for that the expiration is ignored
-        return false;
-    }
+	private Boolean isTokenExpired(String token) {
+		final Date expiration = getExpirationDateFromToken(token);
+		return expiration.before(clock.now());
+	}
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
-    }
+	private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
+		return (lastPasswordReset != null && created.before(lastPasswordReset));
+	}
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
-        final Date createdDate = clock.now();
-        final Date expirationDate = calculateExpirationDate(createdDate);
+	private Boolean ignoreTokenExpiration(String token) {
+		// here you specify tokens, for that the expiration is ignored
+		return false;
+	}
 
-        return Jwts.builder()
-            .setClaims(claims)
-            .setSubject(subject)
-            .setIssuedAt(createdDate)
-            .setExpiration(expirationDate)
-            .signWith(SignatureAlgorithm.HS512, secret)
-            .compact();
-    }
+	public String generateToken(UserDetails userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		return doGenerateToken(claims, userDetails.getUsername());
+	}
 
-    public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
-        final Date created = getIssuedAtDateFromToken(token);
-        return !isCreatedBeforeLastPasswordReset(created, lastPasswordReset)
-            && (!isTokenExpired(token) || ignoreTokenExpiration(token));
-    }
+	private String doGenerateToken(Map<String, Object> claims, String subject) {
+		final Date createdDate = clock.now();
+		final Date expirationDate = calculateExpirationDate(createdDate);
 
-    public String refreshToken(String token) {
-        final Date createdDate = clock.now();
-        final Date expirationDate = calculateExpirationDate(createdDate);
+		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(createdDate)
+				.setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret).compact();
+	}
 
-        final Claims claims = getAllClaimsFromToken(token);
-        claims.setIssuedAt(createdDate);
-        claims.setExpiration(expirationDate);
+	public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
+		final Date created = getIssuedAtDateFromToken(token);
+		return !isCreatedBeforeLastPasswordReset(created, lastPasswordReset)
+				&& (!isTokenExpired(token) || ignoreTokenExpiration(token));
+	}
 
-        return Jwts.builder()
-            .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS512, secret)
-            .compact();
-    }
+	public String refreshToken(String token) {
+		final Date createdDate = clock.now();
+		final Date expirationDate = calculateExpirationDate(createdDate);
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        UserDetailsExtended user = (UserDetailsExtended) userDetails;
-        final String username = getUsernameFromToken(token);
-        final Date created = getIssuedAtDateFromToken(token);
-        //final Date expiration = getExpirationDateFromToken(token);
-        return (
-            username.equals(user.getUsername())
-                && !isTokenExpired(token)
-                && !isCreatedBeforeLastPasswordReset(created, user.getFechaAltaPassword())
-        );
-    }
+		final Claims claims = getAllClaimsFromToken(token);
+		claims.setIssuedAt(createdDate);
+		claims.setExpiration(expirationDate);
 
-    private Date calculateExpirationDate(Date createdDate) {
-        return new Date(createdDate.getTime() + expiration * 1000);
-    }
+		return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secret).compact();
+	}
+
+	public Boolean validateToken(String token, UserDetails userDetails) {
+		UserDetailsExtended user = (UserDetailsExtended) userDetails;
+		final String username = getUsernameFromToken(token);
+		final Date created = getIssuedAtDateFromToken(token);
+		// final Date expiration = getExpirationDateFromToken(token);
+		return (username.equals(user.getUsername()) && !isTokenExpired(token)
+				&& !isCreatedBeforeLastPasswordReset(created, user.getFechaAltaPassword()));
+	}
+
+	private Date calculateExpirationDate(Date createdDate) {
+		return new Date(createdDate.getTime() + expiration * 1000);
+	}
+
+	public String generatePasswordExpiredToken(UserDetails userDetails) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("pwd_expired", true);
+		claims.put("scope", "CHANGE_PASSWORD");
+		return doGenerateToken(claims, userDetails.getUsername());
+	}
 }

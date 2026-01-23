@@ -31,25 +31,32 @@ public class JwtAuthenticationResponse implements Serializable {
 
 	private String username;
 
+	private Boolean passwordExpired;
+
 	public JwtAuthenticationResponse(String token) {
 		this.token = token;
 	}
 
-	public JwtAuthenticationResponse(String token, User usuario) {
+	public JwtAuthenticationResponse(String token, User usuario, Boolean passwordExpired) {
 		this.token = token;
+
 		this.name = usuario.getName();
 		this.lastname = usuario.getLastname();
 		this.email = usuario.getEmail();
 		this.role = "Administrators";
-		this.permissions = new HashSet<Permission>();
-		Set<Profile> profiles = usuario.getProfiles();
-		for (Profile profile : profiles) {
-			this.permissions.addAll(profile.getPermissions());
+		if (!passwordExpired) {
+			this.permissions = new HashSet<Permission>();
+			Set<Profile> profiles = usuario.getProfiles();
+			for (Profile profile : profiles) {
+				this.permissions.addAll(profile.getPermissions());
+			}
+			this.permisos = this.permissions.stream().map(Permission::getCode).collect(Collectors.joining(";"));
 		}
 		UUID uuid = UUID.randomUUID();
 		this.guid = uuid.toString();
-		this.permisos = this.permissions.stream().map(Permission::getCode).collect(Collectors.joining(";"));
 		this.username = usuario.getUsername();
+
+		this.passwordExpired = passwordExpired;
 	}
 
 	public String getPermisos() {
@@ -118,6 +125,14 @@ public class JwtAuthenticationResponse implements Serializable {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	public Boolean getPasswordExpired() {
+		return passwordExpired;
+	}
+
+	public void setPasswordExpired(Boolean passwordExpired) {
+		this.passwordExpired = passwordExpired;
 	}
 
 }

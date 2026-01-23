@@ -49,17 +49,16 @@ public class GrupoEmpleadoRestController
 		return super.create(dto);
 	}
 
-	@Override
-	@RequestMapping(value = "/grupoEmpleado/{idGrupoEmpleado}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<JSONResponse> update(@PathVariable Long idGrupoEmpleado, @RequestBody GrupoEmpleadoDTO dto)
+	@RequestMapping(value = "/grupoEmpleado", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONResponse> update(@RequestBody GrupoEmpleadoDTO dto)
 			throws BusinessException {
 		return super.update(dto.getId(), dto);
 	}
 
 	@Override
-	@RequestMapping(value = "/grupoEmpleado/{idGrupoEmpleado}/{idGrupo}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<JSONResponse> delete(@PathVariable Long id) throws BusinessException {
-		return super.delete(id);
+	@RequestMapping(value = "/grupoEmpleado/{idGrupoEmpleado}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONResponse> delete(@PathVariable Long idGrupoEmpleado) throws BusinessException {
+		return super.delete(idGrupoEmpleado);
 	}
 
 	@Override
