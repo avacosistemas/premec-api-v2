@@ -66,4 +66,16 @@ public class ItemCheckDTO {
 		return this.estado.equals("No Ok");
 	}
 
+	public void setOk(boolean ok) {
+		this.ok = ok;
+	}
+
+	public void setNoOK(boolean noOK) {
+		this.noOK = noOK;
+	}
+
+	public void setNa(boolean na) {
+		this.na = na;
+	}
+
 }
