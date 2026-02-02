@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -36,6 +37,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.JsonArray;
@@ -44,8 +46,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import ar.com.avaco.arc.core.service.MailSenderSMTPService;
+import ar.com.avaco.entities.RegistroHorasMaquinaExcedidaReseteo;
 import ar.com.avaco.factory.ParentObjectIdNotFoundException;
 import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.premec.service.RegistroHorasMaquinaExcedidaReseteoService;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.actividad.ActividadPatch;
 import ar.com.avaco.ws.dto.formulario.FormularioDTO;
@@ -55,6 +59,9 @@ import ar.com.avaco.ws.service.FormularioEPService;
 
 @Service("formularioEPService")
 public class FormularioEPServiceImpl extends AbstractSapService implements FormularioEPService {
+
+	@Autowired
+	private RegistroHorasMaquinaExcedidaReseteoService registroExcesoService;
 
 	@Value("${informe.path}")
 	private String informePath;
@@ -278,10 +285,15 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 		ResponseEntity<String> serialNumReponse = getRestTemplate().doExchange(serialNumQuery, HttpMethod.GET, null,
 				String.class);
 
-		String internalSerialNum = serialNumReponse.getBody();
+		String body = serialNumReponse.getBody();
+
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root = mapper.readTree(body);
+
+		String internalSerialNum = root.get("InternalSerialNum").asText();
 
 		String query = urlSAP + "/$crossjoin(ServiceCalls,ServiceContracts)?"
-				+ "$expand=ServiceContracts($select=U_Hs_Contratadas)&"
+				+ "$expand=ServiceCalls($select=U_HorasMaq),ServiceContracts($select=U_Hs_Contratadas,StartDate)&"
 				+ "$filter=ServiceCalls/ContractID eq ServiceContracts/ContractID "
 				+ "and ServiceCalls/ServiceCallID eq {serviceCallId}";
 
@@ -300,11 +312,22 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 			int maxmensual = jsonElementResp.getAsJsonArray().get(0).getAsJsonObject().get("ServiceContracts")
 					.getAsJsonObject().get("U_Hs_Contratadas").getAsInt();
 
+			String fechaAnteriorActividadContrato = jsonElementResp.getAsJsonArray().get(0).getAsJsonObject()
+					.get("ServiceContracts").getAsJsonObject().get("StartDate").getAsString();
+
+			int hsMaqAnterior = 0;
+
+			JsonElement jsonElement = jsonElementResp.getAsJsonArray().get(0).getAsJsonObject().get("ServiceCalls")
+					.getAsJsonObject().get("U_HorasMaq");
+
+			if (!jsonElement.isJsonNull())
+				hsMaqAnterior = jsonElement.getAsInt();
+
 			String actividadAnterior = "/$crossjoin(ServiceCalls/ServiceCallActivities,Activities)?"
 					+ "$expand=ServiceCalls/ServiceCallActivities($select=ActivityCode,U_U_HsMaq,LineNum),"
-					+ "Activities($select=ActivityCode,StartDate)&"
+					+ "Activities($select=ActivityCode,StartDate,HandledBy)&"
 					+ "$filter=ServiceCalls/ServiceCallActivities/ActivityCode eq Activities/ActivityCode "
-					+ "and ServiceCalls/ServiceCallID eq {serviceCallId} and (Activities/HandledBy eq null or Activities/HandledBy not eq 17 or Activities/HandledBy not eq 29) &"
+					+ "and ServiceCalls/ServiceCallID eq {serviceCallId} &"
 					+ "$orderby=ServiceCalls/ServiceCallActivities/ActivityCode desc&$top=1&$skip=1";
 
 			LOGGER.debug("ServiceCall: " + serviceCallId + " - Obteniendo Actividad previa");
@@ -322,53 +345,81 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 			JsonElement jsonElementResp2 = ((com.google.gson.JsonObject) gson.fromJson(serviceCallActivities.getBody(),
 					JsonObject.class)).get("value");
 
+			// Si tengo actividad anterior
 			if (jsonElementResp2 != null && !jsonElementResp2.isJsonNull() && jsonElementResp2.isJsonArray()
 					&& jsonElementResp2.getAsJsonArray().size() == 1) {
 
-				JsonElement jsonElement = jsonElementResp2.getAsJsonArray().get(0);
+				JsonElement jsonElement2 = jsonElementResp2.getAsJsonArray().get(0);
 
-				int lineNum = jsonElement.getAsJsonObject().get("ServiceCalls/ServiceCallActivities").getAsJsonObject()
-						.get("LineNum").getAsInt();
+				JsonElement handledByElement = jsonElement2.getAsJsonObject().get("Activities").getAsJsonObject()
+						.get("handledBy");
+				if (handledByElement == null || handledByElement.isJsonNull() || handledByElement.getAsInt() == 17
+						|| handledByElement.getAsInt() == 29) {
 
-				int activityCodeAnterior = jsonElement.getAsJsonObject().get("ServiceCalls/ServiceCallActivities")
-						.getAsJsonObject().get("ActivityCode").getAsInt();
+					int lineNum = jsonElement2.getAsJsonObject().get("ServiceCalls/ServiceCallActivities")
+							.getAsJsonObject().get("LineNum").getAsInt();
 
-				JsonElement jsonElementHsMaq = jsonElement.getAsJsonObject().get("ServiceCalls/ServiceCallActivities")
-						.getAsJsonObject().get("U_U_HsMaq");
+					JsonElement jsonElementHsMaq = jsonElement2.getAsJsonObject()
+							.get("ServiceCalls/ServiceCallActivities").getAsJsonObject().get("U_U_HsMaq");
 
-				int hsMaqAnterior = 0;
-				if (!jsonElementHsMaq.isJsonNull()) {
-					hsMaqAnterior = jsonElementHsMaq.getAsInt();
-				} else if (lineNum != 0) {
-					return;
-					// FIXME ajustar validaciones
-//					throw new Exception("La actividad " + activityCodeAnterior + " no tiene horas maquina cargadas y no es la primera de la servicecall " + serviceCallId);
-				}
-
-				String fecha = jsonElement.getAsJsonObject().get("Activities").getAsJsonObject().get("StartDate")
-						.getAsString();
-
-				Date fechaAnterior = DateUtils.toDate(fecha, "yyyy-MM-dd");
-				Date fechaActual = DateUtils.getFechaYHoraActual();
-
-				LocalDateTime date1 = LocalDateTime.ofInstant(fechaActual.toInstant(), ZoneId.systemDefault());
-				LocalDateTime date2 = LocalDateTime.ofInstant(fechaAnterior.toInstant(), ZoneId.systemDefault());
-
-				double diasDouble = Math.abs(new Long(Duration.between(date1, date2).toDays()).doubleValue());
-				double horasDouble = new Long(horasMaquina - hsMaqAnterior);
-
-				if (horasDouble < 0) {
-					notificarReseteoHoras(serviceCallId, fechaAnterior, fechaActual, hsMaqAnterior, horasMaquina);
-				} else {
-
-					double promedio = horasDouble / diasDouble;
-
-					double promedioMax = new Double(maxmensual) / (double) 30;
-
-					if (promedio > promedioMax) {
-						notificarHorasMaquinaSuperadas(serviceCallId, fechaAnterior, fechaActual, hsMaqAnterior,
-								horasMaquina);
+					if (!jsonElementHsMaq.isJsonNull()) {
+						hsMaqAnterior = jsonElementHsMaq.getAsInt();
+					} else if (lineNum != 0) {
+						return;
 					}
+
+					fechaAnteriorActividadContrato = jsonElement2.getAsJsonObject().get("Activities").getAsJsonObject()
+							.get("StartDate").getAsString();
+				}
+			}
+			Date fechaAnterior = DateUtils.toDate(fechaAnteriorActividadContrato, "yyyy-MM-dd");
+			Date fechaActual = DateUtils.getFechaYHoraActual();
+
+			LocalDateTime date1 = LocalDateTime.ofInstant(fechaActual.toInstant(), ZoneId.systemDefault());
+			LocalDateTime date2 = LocalDateTime.ofInstant(fechaAnterior.toInstant(), ZoneId.systemDefault());
+
+			double diasDouble = Math.abs(new Long(Duration.between(date1, date2).toDays()).doubleValue());
+			double horasDouble = new Long(horasMaquina - hsMaqAnterior);
+
+			if (horasDouble < 0) {
+
+				notificarReseteoHoras(serviceCallId, fechaAnterior, fechaActual, hsMaqAnterior, horasMaquina);
+				RegistroHorasMaquinaExcedidaReseteo entity = new RegistroHorasMaquinaExcedidaReseteo();
+				entity.setFechaActual(fechaActual);
+				entity.setFechaAnterior(fechaAnterior);
+				entity.setHorasMaquinaActual(new Double(horasMaquina));
+				entity.setHsMaqAnterior(new Double(hsMaqAnterior));
+				entity.setInternalSerialNum(internalSerialNum);
+				entity.setMaximoMensual(maxmensual);
+				entity.setPromedio(null);
+				entity.setServiceCallId(serviceCallId);
+				entity.setHorasMaquinaExcedidas(null);
+				entity.setTipo("RESETEO");
+				this.registroExcesoService.save(entity);
+
+			} else {
+
+				double promedio = horasDouble / diasDouble;
+
+				double promedioMax = new Double(maxmensual) / (double) 30;
+
+				double exceso = Math.round((promedio - promedioMax) * diasDouble);
+
+				if (promedio > promedioMax) {
+					notificarHorasMaquinaSuperadas(serviceCallId, fechaAnterior, fechaActual, hsMaqAnterior,
+							horasMaquina);
+					RegistroHorasMaquinaExcedidaReseteo entity = new RegistroHorasMaquinaExcedidaReseteo();
+					entity.setFechaActual(fechaActual);
+					entity.setFechaAnterior(fechaAnterior);
+					entity.setHorasMaquinaActual(new Double(horasMaquina));
+					entity.setHsMaqAnterior(new Double(hsMaqAnterior));
+					entity.setInternalSerialNum(internalSerialNum);
+					entity.setMaximoMensual(maxmensual);
+					entity.setPromedio(promedio);
+					entity.setServiceCallId(serviceCallId);
+					entity.setTipo("EXCESO");
+					entity.setHorasMaquinaExcedidas(exceso);
+					this.registroExcesoService.save(entity);
 				}
 			}
 		}
@@ -885,7 +936,7 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 		String query = " select * from att_aux WHERE ESTADO = 'PROCESAR'";
 
 		try {
-			
+
 			Connection conn = DriverManager.getConnection(url, user, password);
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
@@ -998,7 +1049,7 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 			}
 
 			rs.close();
-			
+
 			String updatebien = "update att_aux set estado = 'PROCESADO' where ClgCode in ({ids})".replace("{ids}",
 					String.join(",", bien));
 			if (!bien.isEmpty())
@@ -1008,11 +1059,11 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 					String.join(",", mal));
 			if (!mal.isEmpty())
 				stmt.executeUpdate(updatemal);
-			
+
 			stmt.close();
-			
+
 			conn.close();
-			
+
 		} catch (SQLException | SapBusinessException e) {
 			e.printStackTrace();
 		}

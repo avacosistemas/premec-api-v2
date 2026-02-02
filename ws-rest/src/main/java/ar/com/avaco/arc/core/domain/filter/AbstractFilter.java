@@ -15,6 +15,17 @@ public abstract class AbstractFilter {
 	
 	private Boolean distinctRootEntity;
 
+	public AbstractFilter(Integer rows, Integer first, Boolean asc, String idx) {
+		super();
+		this.rows = rows;
+		this.first = first;
+		this.asc = asc;
+		this.idx = idx;
+	}
+
+	public AbstractFilter() {
+	}
+	
 	public List<FilterData> getFilterDatas() {
 		return new ArrayList<FilterData>();
 	}
