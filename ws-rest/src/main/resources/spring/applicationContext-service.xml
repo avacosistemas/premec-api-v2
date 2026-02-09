@@ -15,7 +15,11 @@
 
 	<ctx:component-scan base-package="ar.com.avaco.premec.repository" resource-pattern="**/*RepositoryImpl.class"/>
 	<ctx:component-scan base-package="ar.com.avaco.premec.service" resource-pattern="**/*ServiceImpl.class"/>
-	<ctx:component-scan base-package="ar.com.avaco.premec.ws.service" resource-pattern="**/*ServiceImpl.class"/>									  
+	<ctx:component-scan base-package="ar.com.avaco.premec.ws.service" resource-pattern="**/*ServiceImpl.class"/>
+	
+	<ctx:component-scan base-package="ar.com.avaco.premec.ws.service" resource-pattern="**/*ServiceImpl.class"/>
+	
+	<ctx:component-scan base-package="ar.com.avaco.premec.sap.service" resource-pattern="**/*ServiceImpl.class"/>									  
 
 	<ctx:component-scan base-package="ar.com.avaco.commons.repository" resource-pattern="**/*RepositoryImpl.class"/>
 	<ctx:component-scan base-package="ar.com.avaco.commons.service" resource-pattern="**/*ServiceImpl.class"/>
