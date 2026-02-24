@@ -46,10 +46,10 @@ public class AccesoEPServiceImpl extends CRUDEPBaseService<Long, AccesoDTO, Acce
 	@Override
 	protected AccesoDTO convertToDto(Acceso entity) {
 		AccesoDTO dto = new AccesoDTO();
-		dto.setId(entity.getPerfil().getId());
+		dto.setId(entity.getId());
 		dto.setIdUsuario(entity.getUsuario().getId());
 		dto.setPerfilNombre(entity.getPerfil().getNombre());
-		return dto;
+		dto.setIdGrupo(entity.getPerfil().getId());	return dto;
 	}
 
 	@Override
