@@ -8,7 +8,7 @@ public class ProblemaMaquinaDTO extends DTOEntity<Long> {
 
 	private String nombre;
 
-	private Long idTipoProblema;
+	private Long idTipoProblemaMaquina;
 
 	private String tipoProblema;
 
@@ -20,12 +20,12 @@ public class ProblemaMaquinaDTO extends DTOEntity<Long> {
 		this.tipoProblema = tipoProblema;
 	}
 
-	public Long getIdTipoProblema() {
-		return idTipoProblema;
+	public Long getIdTipoProblemaMaquina() {
+		return idTipoProblemaMaquina;
 	}
 
-	public void setIdTipoProblema(Long idTipoProblema) {
-		this.idTipoProblema = idTipoProblema;
+	public void setIdTipoProblemaMaquina(Long idTipoProblemaMaquina) {
+		this.idTipoProblemaMaquina = idTipoProblemaMaquina;
 	}
 
 	public Long getId() {

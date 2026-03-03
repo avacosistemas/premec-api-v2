@@ -30,7 +30,7 @@ public class ProblemaMaquinaEPServiceImpl
 		ProblemaMaquina pm = new ProblemaMaquina();
 		pm.setId(dto.getId());
 		pm.setNombre(dto.getNombre());
-		TipoProblemaMaquina tipoProblemaMaquina = this.tipoProblemaMaquinaService.get(dto.getIdTipoProblema());
+		TipoProblemaMaquina tipoProblemaMaquina = this.tipoProblemaMaquinaService.get(dto.getIdTipoProblemaMaquina());
 		pm.setTipoProblemaMaquina(tipoProblemaMaquina);
 		return pm;
 	}
@@ -40,7 +40,7 @@ public class ProblemaMaquinaEPServiceImpl
 		ProblemaMaquinaDTO pm = new ProblemaMaquinaDTO();
 		pm.setId(entity.getId());
 		pm.setNombre(entity.getNombre());
-		pm.setIdTipoProblema(entity.getTipoProblemaMaquina().getId());
+		pm.setIdTipoProblemaMaquina(entity.getTipoProblemaMaquina().getId());
 		pm.setTipoProblema(entity.getTipoProblemaMaquina().getNombre());
 		return pm;
 	}
