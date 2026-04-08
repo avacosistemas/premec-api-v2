@@ -53,6 +53,8 @@
 		<intercept-url pattern="/webjars/**" access="permitAll" />
 		<intercept-url pattern="/v2/api-docs" access="permitAll" />
 
+<intercept-url pattern="/problemaMaquina/*" method="GET" access="permitAll" />
+<intercept-url pattern="/tipoProblemaMaquina" method="GET" access="permitAll" />
 
 		
 		
