@@ -9,7 +9,7 @@ public class BusinessPartnerResponseDTO {
 	@JsonProperty("CardName")
 	private String cardName;
 
-	@JsonProperty("EmailAddress")
+	@JsonProperty("U_correoreclamos")
 	private String emailAddress;
 
 	@JsonProperty("CardCode")

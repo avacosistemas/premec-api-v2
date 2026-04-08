@@ -35,6 +35,12 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 	@Value("${mail.password.cc}")
 	private String cc;
 	
+	@Value("${reclamos.mail.test}")
+	private String mailTest;
+
+	@Value("${email.test}")
+	private Boolean test;
+	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -47,12 +53,17 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 	@Override
 	public Cliente save(Cliente cliente) {
 		try {
+			// Obtengo el BP
 			BusinessPartnerResponseDTO bddto = bpservice.getByCUIT(cliente.getUsername());
+			
+			// le actualizo el mail
+			bpservice.updateEmail(cliente.getUsername(), cliente.getEmail());
+			
+			// Armo la entidad
 			cliente.setNombre(bddto.getCardName());
 			cliente.setBloqueado(false);
 			cliente.setIntentosFallidosLogin(0);
 			cliente.setRequiereCambioPassword(false);
-			cliente.setEmail(bddto.getEmailAddress());
 			String tmppass = KeyGenerators.string().generateKey();
 			cliente.setPassword(passwordEncoder.encode(tmppass));
 			cliente = getRepository().save(cliente);
@@ -81,7 +92,10 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 		msg.append(tmpass);
 		msg.append("<br>");
 		msg.append("Para acceder ingrese en el siguiente link <a href='{urlReclamos}'>Sistema de Reclamos</a>");
-		String email = "alosgonzalez@gmail.com"; //cliente.getEmail();
+		String email = cliente.getEmail();
+		if (test) {
+			email = mailTest;
+		}
 		mailSenderSMTPService.sendMail(from, email, cc, subject.toString(), msg.toString(), null);
 	}
 
@@ -95,7 +109,10 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 		msg.append("La contraseña asignada es: <strong>");
 		msg.append(tmppas);
 		msg.append("<br> Úsela en el siguiente login por única vez y luego deberá cambiarla por una propia.");
-		String email = "alosgonzalez@gmail.com"; //cliente.getEmail();
+		String email = cliente.getEmail();
+		if (test) {
+			email = mailTest;
+		}
 		mailSenderSMTPService.sendMail(from, email, cc, subject.toString(), msg.toString(), null);
 	}
 

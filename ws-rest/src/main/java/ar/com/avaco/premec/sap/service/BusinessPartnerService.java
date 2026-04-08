@@ -7,4 +7,6 @@ public interface BusinessPartnerService {
 
 	BusinessPartnerResponseDTO getByCUIT(String cuit) throws SapBusinessException;
 
+	void updateEmail(String username, String email) throws SapBusinessException;
+
 }
