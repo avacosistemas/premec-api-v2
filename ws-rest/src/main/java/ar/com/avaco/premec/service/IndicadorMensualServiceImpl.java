@@ -61,8 +61,27 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		sql.append(" SELECT ")
 		   .append("     SUM(det.BillableHr) AS facturables, ")
 		   .append("     dbo.fnFormatHoras(SUM(det.BillableHr)) AS facturablesHora, ")
-		   .append("     SUM(det.NonBillHr) AS ociosas, ")
-		   .append("     dbo.fnFormatHoras(SUM(det.NonBillHr)) AS ociosasHora, ")
+		   //.append("     SUM(det.NonBillHr) AS ociosas, ")
+		   //.append("     dbo.fnFormatHoras(SUM(det.NonBillHr)) AS ociosasHora, ")
+		   
+		   .append("     ( ")
+		   .append("         SUM(CASE ")
+		   .append("             WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
+		   .append("             THEN det.EffectHr ELSE 0 ")
+		   .append("         END) ")
+		   .append("         - SUM(det.BillableHr) ")
+		   .append("     ) AS ociosas, ")
+
+		   .append("     dbo.fnFormatHoras( ")
+		   .append("         ( ")
+		   .append("             SUM(CASE ")
+		   .append("                 WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
+		   .append("                 THEN det.EffectHr ELSE 0 ")
+		   .append("             END) ")
+		   .append("             - SUM(det.BillableHr) ")
+		   .append("         ) ")
+		   .append("     ) AS ociosasHora, ")
+		   
 		   .append("     SUM(CASE ")
 		   .append("         WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
 		   .append("         THEN det.EffectHr ELSE 0 ")
@@ -211,8 +230,28 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		   .append("     max(E.firstName + ' ' + E.lastName) AS nombre, ")
 		   .append("     SUM(det.BillableHr) AS facturables, ")
 		   .append("     dbo.fnFormatHoras(SUM(det.BillableHr)) AS facturablesHora, ")
-		   .append("     SUM(det.NonBillHr) AS ociosas, ")
-		   .append("     dbo.fnFormatHoras(SUM(det.NonBillHr)) AS ociosasHora, ")
+		   
+		   //.append("     SUM(det.NonBillHr) AS ociosas, ")
+		   //.append("     dbo.fnFormatHoras(SUM(det.NonBillHr)) AS ociosasHora, ")
+		   
+		   .append("     ( ")
+		   .append("         SUM(CASE ")
+		   .append("             WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
+		   .append("             THEN det.EffectHr ELSE 0 ")
+		   .append("         END) ")
+		   .append("         - SUM(det.BillableHr) ")
+		   .append("     ) AS ociosas, ")
+
+		   .append("     dbo.fnFormatHoras( ")
+		   .append("         ( ")
+		   .append("             SUM(CASE ")
+		   .append("                 WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
+		   .append("                 THEN det.EffectHr ELSE 0 ")
+		   .append("             END) ")
+		   .append("             - SUM(det.BillableHr) ")
+		   .append("         ) ")
+		   .append("     ) AS ociosasHora, ")
+		   
 		   .append("     SUM(CASE ")
 		   .append("         WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
 		   .append("         THEN det.EffectHr ELSE 0 ")
@@ -239,6 +278,7 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		   .append("     MAX(ISNULL(O.cantM, 0)) AS cantM, ")
 		   .append("     MAX(ISNULL(O.cantSV, 0)) AS cantSV, ")
 		   .append("     MAX(ISNULL(O.cantidadActividades, 0)) AS cantidadActividades, ")
+		   
 		   .append("     FORMAT( ")
 		   .append("         CAST( ")
 		   .append("             NULLIF( ")
@@ -254,6 +294,21 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		   .append("         AS DECIMAL(10,2)), ")
 		   .append("     'P2' ")
 		   .append("     ) AS porcentajeValoracion, ")
+
+		   // NUEVOS CAMPOS
+		   
+//		   .append("     CAST( ")
+//		   .append("         CAST( ")
+//		   .append("             (SUM(ISNULL(O.cantidadActividades,0)) * 100.0) / ")
+//		   .append("             NULLIF(MAX(E.U_Objetivo), 0) ")
+//		   .append("         AS DECIMAL(10,2)) ")
+//		   .append("     AS VARCHAR(10)) + '%' AS cumplimientoObjetivo, ")
+		   
+		   .append("     MAX(E.U_Objetivo) AS objetivoActividades, ")
+		   .append("     MAX(ISNULL(cab.U_cumplimientoobjetivo,'')) AS cumplimientoObjetivo, ")
+
+		   .append("     MAX(ISNULL(cab.U_salario,0)) AS salario, ")
+		   .append("     MAX(ISNULL(E.salaryunit,'')) AS unidadSalario, ")
 		   .append("     MAX(cab.u_viaticos)  AS viaticos, ")
 		   .append("     MAX(cab.U_adelanto) AS adelanto, ")
 		   .append("     MAX(cab.U_prestamo) AS prestamo, ")
@@ -278,10 +333,9 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 
 		List<String> exclusionesList = Lists.newArrayList(exclusiones.split(","));
 		for (String exclusion : exclusionesList) {
-			sql.append(" and Details not like '%{exclusion}%' ".replace("{exclusion}", exclusion));
+		    sql.append(" and Details not like '%{exclusion}%' ".replace("{exclusion}", exclusion));
 		}
-			   
-		   
+
 		sql.append("     GROUP BY AttendEmpl ")
 		   .append(" ) O ")
 		   .append("     ON O.AttendEmpl = E.empID ")
@@ -432,8 +486,28 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		   .append(" E.firstName + ' ' + E.lastName AS nombre, ")
 		   .append(" SUM(det.BillableHr) AS facturables, ")
 		   .append(" dbo.fnFormatHoras(SUM(det.BillableHr)) AS facturablesHora, ")
-		   .append(" SUM(det.NonBillHr) AS ociosas, ")
-		   .append(" dbo.fnFormatHoras(SUM(det.NonBillHr)) AS ociosasHora, ")
+		   
+		   //.append(" SUM(det.NonBillHr) AS ociosas, ")
+		   //.append(" dbo.fnFormatHoras(SUM(det.NonBillHr)) AS ociosasHora, ")
+		   
+		   .append("     ( ")
+		   .append("         SUM(CASE ")
+		   .append("             WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
+		   .append("             THEN det.EffectHr ELSE 0 ")
+		   .append("         END) ")
+		   .append("         - SUM(det.BillableHr) ")
+		   .append("     ) AS ociosas, ")
+
+		   .append("     dbo.fnFormatHoras( ")
+		   .append("         ( ")
+		   .append("             SUM(CASE ")
+		   .append("                 WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
+		   .append("                 THEN det.EffectHr ELSE 0 ")
+		   .append("             END) ")
+		   .append("             - SUM(det.BillableHr) ")
+		   .append("         ) ")
+		   .append("     ) AS ociosasHora, ")
+		   
 		   .append(" SUM(CASE WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
 		   .append("      THEN det.EffectHr ELSE 0 END) AS fichado, ")
 		   .append(" dbo.fnFormatHoras(SUM(CASE WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ")
@@ -454,10 +528,15 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		   .append("         (ISNULL(O.cantR,0) * 5) + (ISNULL(O.cantM,0) * 15)) AS DECIMAL(10,2)), ")
 		   .append("   'P2' ")
 		   .append(" ) AS porcentajeValoracion, ")
-		   .append(" E.U_Objetivo AS objetivoActividades, ")
-		   .append(" CAST(CAST((O.cantidadActividades * 100.0) / ")
-		   .append("      NULLIF(E.U_Objetivo, 0) AS DECIMAL(10,2)) AS VARCHAR(10)) + '%' ")
-		   .append(" AS cumplimientoObjetivo ")
+		   
+//		   .append(" E.U_Objetivo AS objetivoActividades, ")
+		   
+		   .append("     MAX(E.U_Objetivo) AS objetivoActividades, ")
+		   .append("     MAX(ISNULL(cab.U_cumplimientoobjetivo,'')) AS cumplimientoObjetivo ")
+		   
+//		   .append(" CAST(CAST((O.cantidadActividades * 100.0) / ")
+//		   .append("      NULLIF(E.U_Objetivo, 0) AS DECIMAL(10,2)) AS VARCHAR(10)) + '%' ")
+//		   .append(" AS cumplimientoObjetivo ")
 		   .append(" FROM OTSH cab ")
 		   .append(" LEFT JOIN TSH1 det ON cab.AbsEntry = det.AbsEntry ")
 		   .append(" INNER JOIN OHEM E ON cab.UserID = E.empID ")
@@ -555,8 +634,6 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 	private RegistroInformeMensualEmpleadoIndividualDTO getIndicadoresByUsuariosAgrupado(String mes, String anio,
 			List<Usuario> users) {
 		
-		List<Usuario> usuarios = usuarioService.list();
-
 		String idsUsuarioSap = users.stream().filter(x-> StringUtils.isNotBlank(x.getUsuariosap())).map((Usuario::getUsuariosap)).map(String::trim).collect(Collectors.joining(","));
 		
 		String fechaDesde = anio + StringUtils.leftPad(mes, 2, "0") + "01";
@@ -572,7 +649,15 @@ public class IndicadorMensualServiceImpl implements IndicadorMensualService {
 		sql.append("    SELECT ");
 		sql.append("        cab.UserID, ");
 		sql.append("        SUM(det.BillableHr) AS facturables, ");
-		sql.append("        SUM(det.NonBillHr) AS ociosas, ");
+		
+		sql.append("     ( ");
+		sql.append("         SUM(CASE ");
+		sql.append("             WHEN det.u_tipoausentismo IS NULL OR det.u_tipoausentismo = '' ");
+		sql.append("             THEN det.EffectHr ELSE 0 ");
+		sql.append("         END) ");
+		sql.append("         - SUM(det.BillableHr) ");
+		sql.append("     ) AS ociosas, ");
+		
 		sql.append("        SUM(CASE ");
 		sql.append("            WHEN det.u_tipoausentismo IS NULL ");
 		sql.append("              OR det.u_tipoausentismo = '' ");
