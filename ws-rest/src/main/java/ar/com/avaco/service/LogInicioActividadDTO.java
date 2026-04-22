@@ -17,6 +17,15 @@ public class LogInicioActividadDTO {
 	private Integer attendEmpl;
 	private String tipoEvento;
 	private String attendEmplName;
+	private String observaciones;
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
 
 	public String getAttendEmplName() {
 		return attendEmplName;

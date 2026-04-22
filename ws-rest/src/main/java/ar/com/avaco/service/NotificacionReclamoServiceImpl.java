@@ -37,6 +37,13 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 	@Value("${mail.notificacion.body.cierre.reclamo}")
 	private String bodyCierreReclamo;
 
+	@Value("${mail.notificacion.subject.rechazo.reclamo}")
+	private String subjectRechazoReclamo;
+
+	@Value("${mail.notificacion.body.rechazo.reclamo}")
+	private String bodyRechazoReclamo;
+	
+	
 	private static final DateTimeFormatter FORMATTER =
 	        DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -61,8 +68,11 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 	        if ("inicio actividad".equals(item.getTipoEvento())) {
 	            subjectTemplate = subjectAsignacionReclamo;
 	            bodyTemplate = bodyAsignacionReclamo;
+	        } else if ("rechazado".equals(item.getTipoEvento())){
+	            subjectTemplate = subjectRechazoReclamo;
+	            bodyTemplate = bodyRechazoReclamo;
 	        } else {
-	            subjectTemplate = subjectCierreReclamo;
+	        	subjectTemplate = subjectCierreReclamo;
 	            bodyTemplate = bodyCierreReclamo;
 	        }
 
@@ -71,6 +81,7 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 	        String nroMaquina = Objects.toString(item.getInternalSerialNum(), "");
 	        String cliente = Objects.toString(item.getCustomerName(), "");
 	        String empleado = Objects.toString(item.getAttendEmplName(), "");
+	        String observaciones = Objects.toString(item.getObservaciones(), "");
 
 	        String fecha = item.getFechaEvento() != null
 	                ? item.getFechaEvento().format(FORMATTER)
@@ -86,8 +97,8 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 	                .replace("{nroMaquina}", nroMaquina)
 	                .replace("{cliente}", cliente)
 	                .replace("{fecha}", fecha)
-	                .replace("{empleado}", empleado);
-
+	                .replace("{empleado}", empleado)
+	                .replace("{observaciones}", observaciones); 
 	        // Envío
 	        String to = item.getCustomerEmail();
 	        
@@ -156,7 +167,8 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 		sql.append(" FechaEvento, ");
 		sql.append(" AttendEmpl, ");
 		sql.append(" TipoEvento, ");
-		sql.append(" AttendEmplName ");
+		sql.append(" AttendEmplName, ");
+		sql.append(" Observaciones ");
 		sql.append("FROM EVENTOS_RECLAMOS ");
 		sql.append("WHERE 1=1 ");
 		sql.append(" ORDER BY FechaEvento DESC ");
@@ -201,6 +213,7 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 		dto.setAttendEmpl((Integer) rs.getObject("AttendEmpl"));
 		dto.setTipoEvento(rs.getString("TipoEvento"));
 		dto.setAttendEmplName(rs.getString("AttendEmplName"));
+		dto.setObservaciones(rs.getString("Observaciones"));
 
 		return dto;
 	}
