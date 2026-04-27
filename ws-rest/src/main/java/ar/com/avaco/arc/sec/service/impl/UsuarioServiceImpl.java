@@ -193,7 +193,7 @@ public class UsuarioServiceImpl extends NJBaseService<Long, Usuario, UsuarioRepo
 		msg.append(".<br>");
 		msg.append("La contraseña asignada es: <strong>");
 		msg.append(tmpass);
-		msg.append(".<br>");
+		msg.append("<br>");
 		mailSenderSMTPService.sendMail(from, user.getEmail(), cc, subject.toString(), msg.toString(), null);
 	}
 
@@ -206,7 +206,7 @@ public class UsuarioServiceImpl extends NJBaseService<Long, Usuario, UsuarioRepo
 		msg.append(".<br>");
 		msg.append("La contraseña asignada es: <strong>");
 		msg.append(tmppas);
-		msg.append(".<br>");
+		msg.append("<br>");
 		mailSenderSMTPService.sendMail(from, user.getEmail(), cc, subject.toString(), msg.toString(), null);
 	}
 

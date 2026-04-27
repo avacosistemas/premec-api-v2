@@ -41,6 +41,9 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 	@Value("${email.test}")
 	private Boolean test;
 	
+	@Value("${reclamos.url}")
+	private String urlReclamos;
+	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -91,7 +94,7 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 		msg.append("La contraseña asignada es: <strong>");
 		msg.append(tmpass);
 		msg.append("<br>");
-		msg.append("Para acceder ingrese en el siguiente link <a href='{urlReclamos}'>Sistema de Reclamos</a>");
+		msg.append("Para acceder ingrese en el siguiente link <a href='" + urlReclamos + "'>Sistema de Reclamos</a>");
 		String email = cliente.getEmail();
 		if (test) {
 			email = mailTest;

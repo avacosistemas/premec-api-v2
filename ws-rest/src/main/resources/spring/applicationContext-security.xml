@@ -44,6 +44,9 @@
 		<intercept-url pattern="/validarHorasMaquina" method="GET" access="permitAll" />
 		<intercept-url pattern="/password/reset" access="permitAll" />
 		
+		<intercept-url pattern="/actividadesPorServiceCall" access="permitAll" />
+		<intercept-url pattern="/descargarreporte" access="permitAll" />
+		
 		<!-- Swagger -->
 		<intercept-url pattern="/swagger-ui.html" access="permitAll" />
 		<intercept-url pattern="/swagger-ui/**" access="permitAll" />
@@ -52,12 +55,8 @@
 		<intercept-url pattern="/swagger-resources/**" access="permitAll" />
 		<intercept-url pattern="/webjars/**" access="permitAll" />
 		<intercept-url pattern="/v2/api-docs" access="permitAll" />
-
 <intercept-url pattern="/problemaMaquina/*" method="GET" access="permitAll" />
-<intercept-url pattern="/tipoProblemaMaquina" method="GET" access="permitAll" />
-
-		
-		
+<intercept-url pattern="/tipoProblemaMaquina" method="GET" access="permitAll" />		
 	    <!-- Protegidos -->
 	    <intercept-url pattern="/auth/reset-password" access="isAuthenticated()" />
 	    <intercept-url pattern="/actividades" method="GET" access="isAuthenticated()" />
