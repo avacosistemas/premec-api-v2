@@ -1,7 +1,7 @@
 package ar.com.avaco.ws.service.impl;
 
 import java.awt.Rectangle;
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +40,7 @@ import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.attachment.AttachmentLine;
 import ar.com.avaco.ws.dto.attachment.ResponseAttachmentGetPost;
 import ar.com.avaco.ws.dto.timesheet.ProjectManagementTimeSheetAttachDTO;
+import ar.com.avaco.ws.dto.timesheet.ReciboSueldoArchivoDTO;
 import ar.com.avaco.ws.dto.timesheet.ReciboSueldoDTO;
 import ar.com.avaco.ws.dto.timesheet.RegistroReciboPorUsuarioDTO;
 import ar.com.avaco.ws.service.AbstractSapService;
@@ -195,70 +197,92 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 	}
 
 	@Override
-	public List<ReciboSueldoDTO> procesarRecibos(String tipo, byte[] archivo) {
+	public List<ReciboSueldoDTO> procesarRecibos(String tipo, byte[] archivo) throws IOException {
 		List<ReciboSueldoDTO> recibos = new ArrayList<>();
-		try {
-			PDDocument documento = PDDocument.load(new ByteArrayInputStream(archivo));
 
-			Rectangle rectPeriodo = new Rectangle(25, 110, 84, 13);
-			Rectangle rectDescripcion = new Rectangle(25 + 84, 110, 84 + 20, 13);
-			Rectangle rectLegajo = new Rectangle(25, 138, 65, 13);
-			Rectangle rectNombre = new Rectangle(91, 138, 205, 13);
-			Rectangle rectNeto = new Rectangle(140, 470, 60, 13);
+		try (PDDocument document = PDDocument.load(archivo)) {
+
+			float pageHeight = document.getPage(0).getMediaBox().getHeight();
+
+			// Rect para extracción (invertido)
+			Rectangle rectLegajo = new Rectangle(20, (int) (pageHeight - 447 - 9), 84, 9);
+			Rectangle rectPeriodo = new Rectangle(20, (int) (pageHeight - 473 - 13), 84, 12);
+			Rectangle rectDescripcion = new Rectangle(20 + 87, (int) (pageHeight - 473 - 13), 133, 12);
+			Rectangle rectNombre = new Rectangle(20 + 87, (int) (pageHeight - 447 - 9), 192, 9);
+			Rectangle rectNeto = new Rectangle(80, 485, 80, 13);
 
 			PDFTextStripperByArea stripper = new PDFTextStripperByArea();
 			stripper.setSortByPosition(true);
+			stripper.addRegion("legajo", rectLegajo);
 			stripper.addRegion("periodo", rectPeriodo);
 			stripper.addRegion("descripcion", rectDescripcion);
-			stripper.addRegion("legajo", rectLegajo);
 			stripper.addRegion("nombre", rectNombre);
 			stripper.addRegion("neto", rectNeto);
 
-			for (int i = 0; i < documento.getNumberOfPages(); i++) {
+			Map<String, ReciboSueldoArchivoDTO> docsPorLegajo = new LinkedHashMap<>();
 
-				PDPage page = documento.getPage(i);
+			for (int i = 0; i < document.getNumberOfPages(); i++) {
+
+				PDPage page = document.getPage(i);
+
 				stripper.extractRegions(page);
 
-//				drawTestRectangle(documento, page, recttest.x, recttest.y, recttest.width, recttest.height, Color.BLUE);
-
-				String periodo = stripper.getTextForRegion("periodo").trim().replace("\\n", "").replace("\\n", "");
-				String descripcion = stripper.getTextForRegion("descripcion").trim().replace("\\n", "").replace("\\n",
-						"");
-				String nombre = stripper.getTextForRegion("nombre").trim().replace("\\n", "").replace("\\n", "");
-				String textoLegajo = stripper.getTextForRegion("legajo").trim().replace("\\n", "").replace("\\n", "");
+				String textoLegajo = stripper.getTextForRegion("legajo").replaceAll("\\s+", "").trim();
+				String periodo = stripper.getTextForRegion("periodo").trim();
+				String descripcion = stripper.getTextForRegion("descripcion").trim();
+				String nombre = stripper.getTextForRegion("nombre").trim();
 				String textoNeto = stripper.getTextForRegion("neto").trim().replace("\\n", "").replace("\\n", "");
+
+				System.out.println(textoLegajo + " " + periodo + " " + descripcion + " " + nombre + " " + textoNeto);
+
+				Long timeInMillis = Calendar.getInstance().getTimeInMillis();
 
 				Integer legajo = Integer.parseInt(textoLegajo);
 				BigDecimal neto = new BigDecimal(textoNeto.replace(",", ""));
 
-				stripper.setStartPage(i + 1);
-				stripper.setEndPage(i + 1);
-
-				String timeInMillis = ((Long) Calendar.getInstance().getTimeInMillis()).toString();
-
 				ReciboSueldoDTO recibo = new ReciboSueldoDTO(legajo, nombre, periodo, neto, tipo, descripcion,
-						timeInMillis);
-				recibos.add(recibo);
+						timeInMillis.toString());
 
-				String month = periodo.split("/")[0];
-				String year = periodo.split("/")[1];
+				ReciboSueldoArchivoDTO recarc = docsPorLegajo.get(textoLegajo);
 
-				String folder = reciboPath + "\\" + year + month;
-				Files.createDirectories(Paths.get(folder));
-				String baseName = folder + "\\" + legajo + "_" + year + month + "_" + tipo + "_" + timeInMillis;
+				PDDocument pdDocument = null;
+				if (recarc == null) {
+					pdDocument = new PDDocument();
+				} else {
+					pdDocument = recarc.getDocument();
+				}
 
-				// Guardar PDF individual
-				PDPage pagina = documento.getPage(i);
-				PDDocument salida = new PDDocument();
-				salida.addPage(pagina);
-				salida.save(baseName + ".pdf");
-				salida.close();
+				pdDocument.addPage(page);
+
+				recarc = new ReciboSueldoArchivoDTO(recibo, pdDocument);
+
+				docsPorLegajo.put(textoLegajo, recarc);
 
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
+			for (Map.Entry<String, ReciboSueldoArchivoDTO> entry : docsPorLegajo.entrySet()) {
+
+				ReciboSueldoDTO recibo = entry.getValue().getReciboSueldo();
+				PDDocument pdfdoc = entry.getValue().getDocument();
+
+				String month = recibo.getPeriodo().split("/")[0];
+				String year = recibo.getPeriodo().split("/")[1];
+
+				String key = recibo.getLegajo() + "_" + year + month + "_" + tipo + "_" + recibo.getTimeInMilis();
+
+				String outputDir = reciboPath + "\\" + year + month;
+				
+				Files.createDirectories(Paths.get(outputDir));
+				
+				File out = new File(outputDir, key + ".pdf");
+				pdfdoc.save(out);
+				pdfdoc.close();
+
+				recibos.add(recibo);
+			}
+
 		}
+
 		return recibos;
 	}
 
@@ -297,7 +321,7 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 		String authHeader = request.getHeader("Authorization");
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		// Obtengo el usuario logueado
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		this.logger.debug("Username: " + username);

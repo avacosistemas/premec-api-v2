@@ -16,7 +16,7 @@ public interface ReciboSueldoService {
 
 	byte[] obtenerReciboPDF(RegistroReciboPorUsuarioDTO recibo) throws IOException;
 
-	List<ReciboSueldoDTO> procesarRecibos(String tipo, byte[] archivo);
+	List<ReciboSueldoDTO> procesarRecibos(String tipo, byte[] archivo) throws IOException;
 
 	byte[] obtenerReciboPDF(Long absEntry, Long attEntry) throws IOException;
 
