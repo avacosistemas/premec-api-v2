@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import ar.com.avaco.ws.dto.timesheet.ArchivoReciboDTO;
 import ar.com.avaco.ws.dto.timesheet.ReciboSueldoDTO;
 import ar.com.avaco.ws.dto.timesheet.RegistroReciboPorUsuarioDTO;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
+import ar.com.avaco.ws.service.ReciboSueldoModernoService;
 import ar.com.avaco.ws.service.ReciboSueldoService;
 
 @RestController
@@ -25,6 +27,24 @@ public class ReciboSueldoRestController {
 
 	private ReciboSueldoService reciboService;
 
+	@Autowired
+	private ReciboSueldoModernoService reciboModernoService;
+	
+	@RequestMapping(value = "/procesarRecibosModernos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONResponse> procesarRecibosModernos() {
+		JSONResponse response = new JSONResponse();
+		try {
+			List<ReciboSueldoDTO> recibos = this.reciboModernoService.procesarRecibos(null, null);
+			response.setData(recibos);
+			response.setStatus(JSONResponse.OK);
+		} catch (Exception e) {
+			response.setStatus(JSONResponse.ERROR);
+			response.setData(e);
+			e.printStackTrace();
+		}
+		return new ResponseEntity<JSONResponse>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/procesarRecibos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<JSONResponse> procesarRecibos(@RequestBody ArchivoReciboDTO archivo) {
 		JSONResponse response = new JSONResponse();
