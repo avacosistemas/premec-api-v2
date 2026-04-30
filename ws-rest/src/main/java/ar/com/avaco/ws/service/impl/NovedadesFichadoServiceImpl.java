@@ -134,6 +134,7 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 						registro.setTarde(getCellValue(fila.getCell(11)).trim());
 						registro.setComentarios(comentarios);
 						registros.add(registro);
+						logger.debug("Linea " + i + " procesada correctamente");
 					}
 					i++;
 				}
@@ -246,8 +247,10 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 					String key = usuarioSap + "-" + fichadoDTO.getDia();
 					HorasPorEmpleadoDTO horasPorEmpleadoDTO = mapaSegundosEmpleadoDiaActividad.get(key);
 
-					double pagoHorasProductivas = horasPorEmpleadoDTO != null ? horasPorEmpleadoDTO.getPagoHorasProductivas() : 0;
-					
+					double pagoHorasProductivas = horasPorEmpleadoDTO != null
+							? horasPorEmpleadoDTO.getPagoHorasProductivas()
+							: 0;
+
 					boolean isTieneAcNoTallerDespuesMediodia = horasPorEmpleadoDTO != null
 							? "Y".equals(horasPorEmpleadoDTO.getTieneActNoTallerDespuesMediodia())
 							: false;
@@ -386,7 +389,8 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 											aplicaComida, fechaFichado, nofacturable, lineNum, ingreso,
 											fichadoDTO.getSalida1(), fichadoDTO.getNormal(), fichadoDTO.getExtra50(),
 											fichadoDTO.getExtra100(), fichadoDTO.getComentarios(),
-											fichadoDTO.getEntrada1(), fichadoDTO.getTarde(), false, pagoHorasProductivas);
+											fichadoDTO.getEntrada1(), fichadoDTO.getTarde(), false,
+											pagoHorasProductivas);
 
 									timesheet.getLineas().add(timesheetline);
 
@@ -455,7 +459,8 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 											aplicaComida, fechaFichado, nofacturableSegundos, lineNum, ingreso,
 											fichadoDTO.getSalida1(), fichadoDTO.getNormal(), fichadoDTO.getExtra50(),
 											fichadoDTO.getExtra100(), fichadoDTO.getComentarios(),
-											fichadoDTO.getEntrada1(), fichadoDTO.getTarde(), false, pagoHorasProductivas);
+											fichadoDTO.getEntrada1(), fichadoDTO.getTarde(), false,
+											pagoHorasProductivas);
 
 									timesheet.getLineas().add(timesheetline);
 
@@ -512,7 +517,8 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 
 	private ProjectManagementTimeSheetLineGetDTO generarTimeSheetLine(boolean aplicaComida, Date fechaFichado,
 			Integer nofacturableSegundos, Long lineNum, String entrada1, String salida1, String normal, String extra50,
-			String extra100, String comentarios, String horaFichado, String tarde, boolean segundoRegistro, double pagarHorasProductivas) {
+			String extra100, String comentarios, String horaFichado, String tarde, boolean segundoRegistro,
+			double pagarHorasProductivas) {
 		ProjectManagementTimeSheetLineGetDTO timesheetline = new ProjectManagementTimeSheetLineGetDTO();
 
 		String codigo = "";
@@ -538,7 +544,7 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 
 		// Nuevo campo horas productivas
 		timesheetline.setPagarHorasProductivas(String.valueOf(pagarHorasProductivas));
-		
+
 		// Obtengo las claves de ferido e injustificado
 		List<String> feriados = Arrays.asList(licenciasFeriado.split(","));
 		List<String> injustificados = Arrays.asList(licenciasNoJustificada.split(","));
@@ -629,7 +635,7 @@ public class NovedadesFichadoServiceImpl extends AbstractSapService implements N
 
 	private static boolean isRowEmpty(Row row) {
 		for (Cell cell : row) {
-			if (cell != null && cell.getCellType() != CellType.BLANK)
+			if (cell != null && cell.getCellType() != CellType.BLANK && !cell.getStringCellValue().trim().equals(""))
 				return false;
 		}
 		return true;
