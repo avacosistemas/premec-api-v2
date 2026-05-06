@@ -86,8 +86,9 @@ public class MailSenderSMTPServiceImpl implements MailSenderSMTPService {
 		try {
 			JavaMailSenderImpl mail = (JavaMailSenderImpl) mailSender;
 			MimeMessage mimeMessage = mail.createMimeMessage();
+			mimeMessage.setHeader("Content-Type", "text/html; charset=UTF-8");
 			MimeMessageHelper helper;
-			helper = new MimeMessageHelper(mimeMessage, true);
+			helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 			StringBuilder sbText = new StringBuilder();
 
 			helper.setFrom(from);
