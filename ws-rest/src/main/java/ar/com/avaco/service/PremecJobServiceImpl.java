@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import ar.com.avaco.entities.JobEnvioFormularioSap;
 import ar.com.avaco.entities.JobNotificacionReclamos;
+import ar.com.avaco.entities.JobNotificacionVencimiento;
 import ar.com.avaco.entities.JobReporteDiario;
 import ar.com.avaco.ws.service.ActividadEPService;
 import ar.com.avaco.ws.service.FormularioEPService;
@@ -45,6 +46,9 @@ public class PremecJobServiceImpl implements PremecJobService {
 	@Value("${cron.notificacionReclamos}")
 	private String cronNotificacionReclamos;
 
+	@Value("${cron.notificacionVencimiento}")
+	private String cronNotificacionVencimiento;
+
 	@Value("${cron.inicar}")
 	private boolean iniciar;
 
@@ -58,6 +62,9 @@ public class PremecJobServiceImpl implements PremecJobService {
 
 	@Autowired
 	private NotificacionReclamoService notificacionReclamoService;
+	
+	@Autowired
+	private NotificacionVencimientoService notificacionVencimientoService;
 	
 	private static final Logger LOGGER = Logger.getLogger(PremecJobService.class);
 
@@ -75,6 +82,7 @@ public class PremecJobServiceImpl implements PremecJobService {
 			newJobDataMap.put("reporteEPService", reporteEPService);
 			newJobDataMap.put("formularioEPService", formularioEPService);
 			newJobDataMap.put("notificacionReclamoService", notificacionReclamoService);
+			newJobDataMap.put("notificacionVencimientoService", notificacionVencimientoService);
 
 			JobDetail jobReporteDiario = JobBuilder.newJob(JobReporteDiario.class)
 					.withIdentity("reporteDiarioJob", "reporteDiarioGroup").usingJobData(newJobDataMap).build();
@@ -91,6 +99,14 @@ public class PremecJobServiceImpl implements PremecJobService {
 					.withIdentity("notificacionReclamosTrigger", "notificacionReclamosGroup")
 					.withSchedule(CronScheduleBuilder.cronSchedule(cronNotificacionReclamos)).build();
 			scheduler.scheduleJob(jobNotificacionReclamos, triggerNotificacionReclamos);
+
+			
+			JobDetail jobNotificacionVencimientos = JobBuilder.newJob(JobNotificacionVencimiento.class)
+					.withIdentity("notificacionVencimientoJob", "notificacionVencimientoGroup").usingJobData(newJobDataMap).build();
+			Trigger triggerNotificacionVencimiento = TriggerBuilder.newTrigger()
+					.withIdentity("notificacionVencimientoTrigger", "notificacionVencimientoGroup")
+					.withSchedule(CronScheduleBuilder.cronSchedule(cronNotificacionReclamos)).build();
+			scheduler.scheduleJob(jobNotificacionVencimientos, triggerNotificacionVencimiento);
 			
 			
 
@@ -101,6 +117,7 @@ public class PremecJobServiceImpl implements PremecJobService {
 					.withIdentity("envioFormularioSapTrigger", "envioFormularioSapGroup")
 					.withSchedule(CronScheduleBuilder.cronSchedule(cronEnvioFormularioSap)).build();
 			scheduler.scheduleJob(jobEnvioFormularioSap, triggerJobEnvioFormularioSap);
+			
 
 
 			scheduler.start();

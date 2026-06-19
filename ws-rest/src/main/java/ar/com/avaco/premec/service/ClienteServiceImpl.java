@@ -3,6 +3,17 @@
  */
 package ar.com.avaco.premec.service;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
 import ar.com.avaco.arc.core.service.MailSenderSMTPService;
+import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.commons.exception.ErrorValidationException;
 import ar.com.avaco.factory.SapBusinessException;
 import ar.com.avaco.premec.domain.Cliente;
 import ar.com.avaco.premec.repository.ClienteRepository;
 import ar.com.avaco.premec.sap.dto.BusinessPartnerResponseDTO;
 import ar.com.avaco.premec.sap.service.BusinessPartnerService;
+import ar.com.avaco.ws.service.impl.SQLServerConnection;
 
 /**
  * @author avaco
@@ -53,6 +66,9 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 	@Autowired
 	private BusinessPartnerService bpservice;
 
+	@Autowired
+	private SQLServerConnection sqlcon;
+	
 	@Override
 	public Cliente save(Cliente cliente) {
 		try {
@@ -66,7 +82,7 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 			cliente.setNombre(bddto.getCardName());
 			cliente.setBloqueado(false);
 			cliente.setIntentosFallidosLogin(0);
-			cliente.setRequiereCambioPassword(false);
+			cliente.setRequiereCambioPassword(true);
 			String tmppass = KeyGenerators.string().generateKey();
 			cliente.setPassword(passwordEncoder.encode(tmppass));
 			cliente = getRepository().save(cliente);
@@ -83,6 +99,40 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 		}
 	}
 
+	@Override
+	public List<Cliente> list() {
+		List<Cliente> list = super.list();
+
+		Map<String, String> mails = new HashMap<String, String>();
+		
+		String sqlString = "select U_correoreclamos, CardCode from OCRD where U_correoreclamos is not null";
+		try (Connection conn = sqlcon.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sqlString );
+				ResultSet rs = stmt.executeQuery()) {
+
+			while (rs.next()) {
+				String cuit = rs.getString("CardCode").replace("C", "");
+				String email = rs.getString("U_correoreclamos").trim();
+				mails.put(cuit, email);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		Iterator<Cliente> iter = list.iterator();
+		while (iter.hasNext()) {
+			Cliente next = iter.next();
+			String username = next.getUsername();
+			String mail = mails.containsKey(username) ? mails.get(username): "Falta asociar en SAP";
+			next.setEmail(mail);
+		}
+		
+		return list;
+		
+	}
+	
 	private void notificarPasswordNuevoCliente(Cliente cliente, String tmpass) {
 		String subject = "Premec Reclamos - Bievenida";
 		StringBuilder msg = new StringBuilder("¡Bienvenido ");
@@ -95,23 +145,6 @@ public class ClienteServiceImpl extends NJBaseService<Long, Cliente, ClienteRepo
 		msg.append(tmpass);
 		msg.append("<br>");
 		msg.append("Para acceder ingrese en el siguiente link <a href='" + urlReclamos + "'>Sistema de Reclamos</a>");
-		String email = cliente.getEmail();
-		if (test) {
-			email = mailTest;
-		}
-		mailSenderSMTPService.sendMail(from, email, cc, subject.toString(), msg.toString(), null);
-	}
-
-	private void notificarPassword(Cliente cliente, String tmppas) {
-		String subject = " Premec Reclamos - Reseteo de contraseña";
-		StringBuilder msg = new StringBuilder("Estimado ");
-		msg.append(cliente.getNombre());
-		msg.append("<br>Se le ha asignado una contraseña temporal a su usuario ");
-		msg.append(cliente.getUsername());
-		msg.append(".<br>");
-		msg.append("La contraseña asignada es: <strong>");
-		msg.append(tmppas);
-		msg.append("<br> Úsela en el siguiente login por única vez y luego deberá cambiarla por una propia.");
 		String email = cliente.getEmail();
 		if (test) {
 			email = mailTest;

@@ -42,82 +42,74 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 
 	@Value("${mail.notificacion.body.rechazo.reclamo}")
 	private String bodyRechazoReclamo;
-	
-	
-	private static final DateTimeFormatter FORMATTER =
-	        DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+	@Value("${reclamos.mail.creacion.subject}")
+	private String subjectCreacionReclamo;
+
+	@Value("${reclamos.mail.creacion.body}")
+	private String bodyCreacionReclamo;
+
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 	@Value("${reclamos.mail.test}")
 	private String mailTest;
-	
+
 	@Value("${email.test}")
 	private boolean test;
-	
+
 	@Override
 	public void enviarNotificaciones() {
 
-	    List<LogInicioActividadDTO> logsInicioActividad = getLogsInicioActividad();
-	    List<Integer> idsToDelete = new ArrayList<>();
+		List<LogInicioActividadDTO> logsInicioActividad = getLogsInicioActividad();
+		List<Integer> idsToDelete = new ArrayList<>();
 
-	    for (LogInicioActividadDTO item : logsInicioActividad) {
+		for (LogInicioActividadDTO item : logsInicioActividad) {
 
-	        // Templates
-	        String subjectTemplate;
-	        String bodyTemplate;
+			// Templates
+			String subjectTemplate;
+			String bodyTemplate;
 
-	        if ("inicio actividad".equals(item.getTipoEvento())) {
-	            subjectTemplate = subjectAsignacionReclamo;
-	            bodyTemplate = bodyAsignacionReclamo;
-	        } else if ("rechazado".equals(item.getTipoEvento())){
-	            subjectTemplate = subjectRechazoReclamo;
-	            bodyTemplate = bodyRechazoReclamo;
-	        } else {
-	        	subjectTemplate = subjectCierreReclamo;
-	            bodyTemplate = bodyCierreReclamo;
-	        }
+			if ("inicio actividad".equals(item.getTipoEvento())) {
+				subjectTemplate = subjectAsignacionReclamo;
+				bodyTemplate = bodyAsignacionReclamo;
+			} else if ("rechazado".equals(item.getTipoEvento())) {
+				subjectTemplate = subjectRechazoReclamo;
+				bodyTemplate = bodyRechazoReclamo;
+			} else if ("CREACION".equals(item.getTipoEvento())) {
+				subjectTemplate = subjectCreacionReclamo;
+				bodyTemplate = bodyCreacionReclamo;
+			} else {
+				subjectTemplate = subjectCierreReclamo;
+				bodyTemplate = bodyCierreReclamo;
+			}
 
-	        // Valores null-safe
-	        String nroReclamo = String.valueOf(item.getServiceCallId());
-	        String nroMaquina = Objects.toString(item.getInternalSerialNum(), "");
-	        String cliente = Objects.toString(item.getCustomerName(), "");
-	        String empleado = Objects.toString(item.getAttendEmplName(), "");
-	        String observaciones = Objects.toString(item.getObservaciones(), "");
+			// Valores null-safe
+			String nroReclamo = String.valueOf(item.getServiceCallId());
+			String nroMaquina = Objects.toString(item.getInternalSerialNum(), "");
+			String cliente = Objects.toString(item.getCustomerName(), "");
+			String empleado = Objects.toString(item.getAttendEmplName(), "");
+			String observaciones = Objects.toString(item.getObservaciones(), "");
 
-	        String fecha = item.getFechaEvento() != null
-	                ? item.getFechaEvento().format(FORMATTER)
-	                : "";
+			String fecha = item.getFechaEvento() != null ? item.getFechaEvento().format(FORMATTER) : "";
 
-	        // Reemplazos (una sola cadena base)
-	        String subject = subjectTemplate
-	                .replace("{nroReclamo}", nroReclamo)
-	                .replace("{nroMaquina}", nroMaquina);
+			// Reemplazos (una sola cadena base)
+			String subject = subjectTemplate.replace("{nroReclamo}", nroReclamo).replace("{nroMaquina}", nroMaquina);
 
-	        String body = bodyTemplate
-	                .replace("{nroReclamo}", nroReclamo)
-	                .replace("{nroMaquina}", nroMaquina)
-	                .replace("{cliente}", cliente)
-	                .replace("{fecha}", fecha)
-	                .replace("{empleado}", empleado)
-	                .replace("{observaciones}", observaciones); 
-	        // Envío
-	        String to = item.getCustomerEmail();
-	        
-	        if (test)
-	        	to = mailTest;
-	        	
-			this.mailSenderSMTPService.sendMail(
-	                "reportesservicios@premecsa.com.ar",
-	                to,
-	                null,
-	                subject,
-	                body,
-	                null
-	        );
+			String body = bodyTemplate.replace("{nroReclamo}", nroReclamo).replace("{nroMaquina}", nroMaquina)
+					.replace("{cliente}", cliente).replace("{fecha}", fecha).replace("{empleado}", empleado)
+					.replace("{observaciones}", observaciones);
+			// Envío
+			String to = item.getCustomerEmail();
 
-	        idsToDelete.add(item.getId());
-	    }
+			if (test)
+				to = mailTest;
 
-	    deleteEventosBatch(idsToDelete);
+			this.mailSenderSMTPService.sendMail("reportesservicios@premecsa.com.ar", to, "servicios@premecsa.com.ar", subject, body, null);
+
+			idsToDelete.add(item.getId());
+		}
+
+		deleteEventosBatch(idsToDelete);
 	}
 
 	public void deleteEventosBatch(List<Integer> ids) {
