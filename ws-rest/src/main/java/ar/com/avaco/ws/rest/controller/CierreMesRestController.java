@@ -24,7 +24,7 @@ public class CierreMesRestController {
 	private CierreMesService cierreMesService;
 
 	@RequestMapping(value = "/cierremespreview", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<JSONResponse> procesarExcelFichado(@RequestParam String mes, @RequestParam String anio) {
+	public ResponseEntity<JSONResponse> cierreMesPreview(@RequestParam String mes, @RequestParam String anio) {
 		JSONResponse response = new JSONResponse();
 		List<RegistroPreviewEmpleadoMensualDTO> preview = this.cierreMesService.getRegistrosCierre(mes, anio);
 		response.setData(preview);
@@ -33,7 +33,7 @@ public class CierreMesRestController {
 	}
 
 	@RequestMapping(value = "/cierremespreview", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<JSONResponse> enviarFichados(@RequestBody List<RegistroPreviewEmpleadoMensualDTO> cierre, @RequestParam String mes, @RequestParam String anio) throws IOException {
+	public ResponseEntity<JSONResponse> cerrarMes(@RequestBody List<RegistroPreviewEmpleadoMensualDTO> cierre, @RequestParam String mes, @RequestParam String anio) throws IOException {
 		JSONResponse response = new JSONResponse();
 		try {
 			this.cierreMesService.cerrarMes(cierre, anio, mes);

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import ar.com.avaco.arc.core.domain.filter.ReclamoFilterDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallActivityDTO;
+import ar.com.avaco.premec.sap.dto.ServiceCallMachineStatsDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallReclamoListDTO;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.service.AbstractSapService;
@@ -25,62 +26,51 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 	@Autowired
 	private SQLServerConnection sqlcon;
 
-
 	@Override
 	public List<ServiceCallActivityDTO> getActivitiesByServiceCall(Long serviceCallId) {
 
-	    StringBuilder sql = new StringBuilder();
+		StringBuilder sql = new StringBuilder();
 
-	    sql.append("SELECT ")
-	       .append("ServiceCallId, ")
-	       .append("ActivityCode, ")
-	       .append("Resolucion, ")
-	       .append("Fecha, ")
-	       .append("HoraInicio, ")
-	       .append("HoraFin, ")
-	       .append("EmpleadoAsignado, ")
-	       .append("Estado, ")
-	       .append("Valoracion, ")
-	       .append("Supervisor ")
-	       .append("FROM VW_ServiceCallActivitiesReclamos ")
-	       .append("WHERE ServiceCallId = ? ")
-	       .append("ORDER BY Fecha DESC, HoraInicio DESC");
+		sql.append("SELECT ").append("ServiceCallId, ").append("ActivityCode, ").append("Resolucion, ")
+				.append("Fecha, ").append("HoraInicio, ").append("HoraFin, ").append("EmpleadoAsignado, ")
+				.append("Estado, ").append("Valoracion, ").append("Supervisor ")
+				.append("FROM VW_ServiceCallActivitiesReclamos ").append("WHERE ServiceCallId = ? ")
+				.append("ORDER BY Fecha DESC, HoraInicio DESC");
 
-	    List<ServiceCallActivityDTO> result = new ArrayList<>();
+		List<ServiceCallActivityDTO> result = new ArrayList<>();
 
-	    try (Connection conn = sqlcon.getConnection();
-	         PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+		try (Connection conn = sqlcon.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-	        stmt.setLong(1, serviceCallId);
+			stmt.setLong(1, serviceCallId);
 
-	        try (ResultSet rs = stmt.executeQuery()) {
+			try (ResultSet rs = stmt.executeQuery()) {
 
-	            while (rs.next()) {
+				while (rs.next()) {
 
-	                ServiceCallActivityDTO dto = new ServiceCallActivityDTO();
+					ServiceCallActivityDTO dto = new ServiceCallActivityDTO();
 
-	                dto.setServiceCallId(rs.getInt("ServiceCallId"));
-	                dto.setActivityCode(rs.getInt("ActivityCode"));
-	                dto.setResolucion(rs.getString("Resolucion"));
-	                dto.setFecha(rs.getString("Fecha"));
-	                dto.setHoraInicio(rs.getString("HoraInicio"));
-	                dto.setHoraFin(rs.getString("HoraFin"));
-	                dto.setEmpleadoAsignado(rs.getString("EmpleadoAsignado"));
-	                dto.setEstado(rs.getString("Estado"));
-	                dto.setValoracion(rs.getString("Valoracion"));
-	                dto.setSupervisor(rs.getString("Supervisor"));
+					dto.setServiceCallId(rs.getInt("ServiceCallId"));
+					dto.setActivityCode(rs.getInt("ActivityCode"));
+					dto.setResolucion(rs.getString("Resolucion"));
+					dto.setFecha(rs.getString("Fecha"));
+					dto.setHoraInicio(rs.getString("HoraInicio"));
+					dto.setHoraFin(rs.getString("HoraFin"));
+					dto.setEmpleadoAsignado(rs.getString("EmpleadoAsignado"));
+					dto.setEstado(rs.getString("Estado"));
+					dto.setValoracion(rs.getString("Valoracion"));
+					dto.setSupervisor(rs.getString("Supervisor"));
 
-	                result.add(dto);
-	            }
-	        }
+					result.add(dto);
+				}
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	    return result;
+		return result;
 	}
-	
+
 	@Override
 	public List<ServiceCallReclamoListDTO> getServiceCalls(ReclamoFilterDTO filter) {
 
@@ -89,11 +79,10 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 		sql.append("SELECT CustomerName,CustomerCode,ServiceCallID,Asunto,EstadoServiceCall,estadoReclamo, ")
 				.append(" FechaCreacion,HoraCreacion,FechaInicioActividad,FechaFinActividad, ")
 				.append(" EquipmentCardNum,ManufacturerSerialNum,InternalSN,ItemCode,ItemName, DetalleReclamoRechazado, ")
-				.append(" COUNT(*) OVER() AS TotalRegistros ")
-				.append(" FROM VW_ServiceCalls_Reclamos WHERE 1 = 1 ");
+				.append(" COUNT(*) OVER() AS TotalRegistros ").append(" FROM VW_ServiceCalls_Reclamos WHERE 1 = 1 ");
 
 		List<Object> params = new ArrayList<>();
-		
+
 		if (filter.getServiceCallID() != null) {
 			sql.append("AND ServiceCallID = ?  ");
 			params.add(filter.getServiceCallID());
@@ -103,7 +92,7 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 			sql.append("AND CustomerCode like ?  ");
 			params.add("%" + filter.getCustomerCode() + "%");
 		}
-		
+
 		// --- Filtro por internal serial ---
 		if (filter.getInternalSerialNum() != null && !filter.getInternalSerialNum().isEmpty()) {
 			sql.append("AND InternalSN = ? ");
@@ -146,30 +135,23 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 			sql.append(" AND estadoReclamo = '" + filter.getEstado() + "'");
 		}
 
-		
-
 		int pageSize = filter.getPageSize() != null ? filter.getPageSize() : 20;
 
-		int page = filter.getPage() == null || filter.getPage() == 0  ? 1: filter.getPage();
+		int page = filter.getPage() == null || filter.getPage() == 0 ? 1 : filter.getPage();
 
 		int offset = (page - 1) * pageSize;
-		
-		
-		
+
 		// --- Orden ---
-		
+
 		if (filter.getIdx() != null) {
 			String orderDirection = Boolean.TRUE.equals(filter.getAsc()) ? "ASC" : "DESC";
-			sql.append(" ORDER BY ")
-			   .append(filter.getIdx())
-			   .append(" ")
-			   .append(orderDirection);
+			sql.append(" ORDER BY ").append(filter.getIdx()).append(" ").append(orderDirection);
 		} else {
 			sql.append("ORDER BY FechaCreacion DESC");
 		}
-		
+
 		sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
-		
+
 		params.add(offset);
 		params.add(pageSize);
 
@@ -209,8 +191,12 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 		dto.setFechaCreacion(DateUtils.toString(rs.getDate("FechaCreacion"), "dd/MM/yyyy"));
 		dto.setHoraCreacion(rs.getInt("HoraCreacion"));
 
-		dto.setFechaInicioActividad(rs.getDate("FechaInicioActividad") != null ? DateUtils.toString(rs.getDate("FechaInicioActividad"), "dd/MM/yyyy") : null);
-		dto.setFechaFinActividad(rs.getDate("FechaFinActividad") != null ? DateUtils.toString(rs.getDate("FechaFinActividad"), "dd/MM/yyyy"): null);
+		dto.setFechaInicioActividad(rs.getDate("FechaInicioActividad") != null
+				? DateUtils.toString(rs.getDate("FechaInicioActividad"), "dd/MM/yyyy")
+				: null);
+		dto.setFechaFinActividad(rs.getDate("FechaFinActividad") != null
+				? DateUtils.toString(rs.getDate("FechaFinActividad"), "dd/MM/yyyy")
+				: null);
 
 		dto.setEquipmentCardNum(rs.getInt("EquipmentCardNum"));
 		dto.setManufacturerSerialNum(rs.getString("ManufacturerSerialNum"));
@@ -219,7 +205,7 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 		dto.setItemName(rs.getString("ItemName"));
 
 		dto.setMotivoRechazo(rs.getString("DetalleReclamoRechazado"));
-		
+
 		dto.setTotalRegistros(rs.getInt("TotalRegistros"));
 
 		return dto;
@@ -234,6 +220,55 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 
 		}
 		return null;
+	}
+
+	@Override
+	public List<ServiceCallMachineStatsDTO> getEstadisticasMaquinaParada(String machine, String periodosJson) {
+
+		StringBuilder sql = new StringBuilder();
+
+		sql.append("EXEC SP_GetMachineReclamoStats ?, ?");
+
+		List<ServiceCallMachineStatsDTO> result = new ArrayList<>();
+
+		try (Connection conn = sqlcon.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+			stmt.setString(1, machine);
+			stmt.setString(2, periodosJson);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+
+				while (rs.next()) {
+
+					ServiceCallMachineStatsDTO dto = new ServiceCallMachineStatsDTO();
+
+					dto.setMaquina(rs.getString("Maquina"));
+
+					Object anioObj = rs.getObject("Anio");
+					if (anioObj != null) {
+						dto.setAnio(rs.getInt("Anio"));
+					}
+
+					Object mesObj = rs.getObject("Mes");
+					if (mesObj != null) {
+						dto.setMes(rs.getInt("Mes"));
+					}
+
+					dto.setCantidadReclamos(rs.getInt("CantidadReclamos"));
+
+					dto.setDiasParadaTotal(rs.getInt("DiasParadaTotal"));
+
+					dto.setTotalGeneral(rs.getBoolean("TotalGeneral"));
+
+					result.add(dto);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 }

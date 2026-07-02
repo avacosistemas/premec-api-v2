@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AttachmentLine {
 
+	@JsonProperty("LineNum")
+	private Long line;
+
 	@JsonProperty("AbsoluteEntry")
 	private Long absoluteEntry;
 
@@ -26,6 +29,25 @@ public class AttachmentLine {
 
 	@JsonProperty("TargetPath")
 	private String targetPath;
+
+	@JsonProperty("EDocSign")
+	private String firmado;
+
+	public Long getLine() {
+		return line;
+	}
+
+	public void setLine(Long line) {
+		this.line = line;
+	}
+
+	public String getFirmado() {
+		return firmado;
+	}
+
+	public void setFirmado(String firmado) {
+		this.firmado = firmado;
+	}
 
 	public Long getAbsoluteEntry() {
 		return absoluteEntry;

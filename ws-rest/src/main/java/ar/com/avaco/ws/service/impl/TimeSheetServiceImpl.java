@@ -1,5 +1,6 @@
 package ar.com.avaco.ws.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +35,17 @@ public class TimeSheetServiceImpl extends AbstractSapService implements TimeShee
 	private Logger logger = Logger.getLogger(TimeSheetServiceImpl.class);
 	
 	@Override
-	public Long generarTimeSheet(Long usuarioSap, String from, String to) {
+	public Long generarTimeSheet(Long usuarioSap, String from, String to, BigDecimal neto, BigDecimal sueldoJornal) {
 		Map<String, Object> pmtsMap = new HashMap<>();
 		pmtsMap.put("UserID", usuarioSap);
 		pmtsMap.put("DateFrom", from);
 		pmtsMap.put("DateTo", to);
+		
+		if (sueldoJornal != null)
+			pmtsMap.put("U_salario", sueldoJornal);
+		
+		if (neto != null)
+			pmtsMap.put("U_sueldoneto ", neto);
 
 		String pmtsUrlPost = urlSAP + "/ProjectManagementTimeSheet";
 		HttpEntity<Map<String, Object>> httpEntityAttach = new HttpEntity<>(pmtsMap);
@@ -58,6 +65,10 @@ public class TimeSheetServiceImpl extends AbstractSapService implements TimeShee
 
 		Long absEntry = gson.fromJson(pmtsResponse.getBody(), JsonObject.class).get("AbsEntry").getAsLong();
 		return absEntry;
+	}
+
+	public Long generarTimeSheet(Long usuarioSap, String from, String to) {
+		return generarTimeSheet(usuarioSap, from, to, null, null);
 	}
 
 	@Override
@@ -102,14 +113,25 @@ public class TimeSheetServiceImpl extends AbstractSapService implements TimeShee
 
 		return ret;
 	}
+	
+	@Override
+	public void updateTimeSheet(Long absEntry, Long newAttachmentEntry) {
+		updateTimeSheet(absEntry, newAttachmentEntry, null, null);
+	}
 
 	@Override
-	public void updateTimeSheetAttachmentEntry(Long absEntry, Long newAttachmentEntry) {
+	public void updateTimeSheet(Long absEntry, Long newAttachmentEntry, BigDecimal neto, BigDecimal sueldoJornal) {
 		String timeSheetPatchEntry = urlSAP + "/ProjectManagementTimeSheet(" + absEntry + ")";
 
 		Map<String, Object> timesheetpatch = new HashMap<>();
 		timesheetpatch.put("AttachmentEntry", newAttachmentEntry);
 
+		if (sueldoJornal != null)
+			timesheetpatch.put("U_salario", sueldoJornal);
+		
+		if (neto != null)
+			timesheetpatch.put("U_sueldoneto", neto);
+		
 		HttpHeaders headers = getRestTemplate().getDefaultHeaders();
 		HttpEntity<Map<String, Object>> httpEntityPatchServiceCall = new HttpEntity<>(timesheetpatch, headers);
 
@@ -232,8 +254,6 @@ public class TimeSheetServiceImpl extends AbstractSapService implements TimeShee
 		String fechaDesde = "'" + from + "'";
 		String fechaHasta = "'" + to + "'";
 		
-		
-		
 		String urlObtenerPMTSGet = urlSAP + "/ProjectManagementTimeSheet?$filter=DateFrom eq " + fechaDesde + " and DateTo eq " + fechaHasta;
 		
 		ResponseEntity<ProjectManagementTimeSheetLinesResponse> timeshteeRespose = null;
@@ -252,15 +272,6 @@ public class TimeSheetServiceImpl extends AbstractSapService implements TimeShee
 				timeshteeRespose = getRestTemplate().doExchange(urlObtenerPMTSGet, HttpMethod.GET, null,
 						ProjectManagementTimeSheetLinesResponse.class);
 							
-				logger.debug("Respuesta obtenida ");
-				String json = "No se pudo parsear";
-				try {
-					json = mapper.writeValueAsString(timeshteeRespose.getBody());
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-				logger.debug(json);
-				
 				List<ProjectManagementTimeSheetGetDTO> res = timeshteeRespose.getBody().getValue();
 				
 				list.addAll(res);

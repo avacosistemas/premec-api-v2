@@ -8,6 +8,7 @@ public class ReciboSueldoDTO {
 	private String nombreCompleto;
 	private String periodo;
 	private BigDecimal neto;
+	private BigDecimal sueldoJornal;
 	private String tipo;
 	private String observaciones;
 	private Boolean aprobado;
@@ -18,7 +19,7 @@ public class ReciboSueldoDTO {
 	}
 
 	public ReciboSueldoDTO(int legajo, String nombreCompleto, String periodo, BigDecimal neto, String tipo,
-			String descripcion, String timeInMilis) {
+			String descripcion, String timeInMilis, BigDecimal sueldoJornal) {
 		super();
 		this.legajo = legajo;
 		this.nombreCompleto = nombreCompleto;
@@ -27,6 +28,15 @@ public class ReciboSueldoDTO {
 		this.tipo = tipo;
 		this.descripcion = descripcion;
 		this.timeInMilis = timeInMilis;
+		this.sueldoJornal = sueldoJornal;
+	}
+
+	public BigDecimal getSueldoJornal() {
+		return sueldoJornal;
+	}
+
+	public void setSueldoJornal(BigDecimal sueldoJornal) {
+		this.sueldoJornal = sueldoJornal;
 	}
 
 	public String getTimeInMilis() {

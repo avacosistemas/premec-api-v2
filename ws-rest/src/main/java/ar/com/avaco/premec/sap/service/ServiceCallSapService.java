@@ -4,6 +4,7 @@ import java.util.List;
 
 import ar.com.avaco.arc.core.domain.filter.ReclamoFilterDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallActivityDTO;
+import ar.com.avaco.premec.sap.dto.ServiceCallMachineStatsDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallReclamoListDTO;
 
 public interface ServiceCallSapService {
@@ -12,4 +13,6 @@ public interface ServiceCallSapService {
 	
 	List<ServiceCallActivityDTO> getActivitiesByServiceCall(Long serviceCallId);
 
+	List<ServiceCallMachineStatsDTO> getEstadisticasMaquinaParada(String machine, String periodosJson);
+	
 }

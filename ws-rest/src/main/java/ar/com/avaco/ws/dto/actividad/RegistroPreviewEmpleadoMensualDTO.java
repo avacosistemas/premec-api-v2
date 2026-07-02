@@ -43,9 +43,9 @@ public class RegistroPreviewEmpleadoMensualDTO {
 
 	private String cumplimientoObjetivo;
 
-	private String salario;
+//	private String salario;
 
-	private String unidadSalario;
+//	private String unidadSalario;
 
 	// Campos ingresados a mano
 
@@ -74,7 +74,7 @@ public class RegistroPreviewEmpleadoMensualDTO {
 		map.put("U_porcentajevaloracion", this.porcentajeValoracion);
 		map.put("U_porcentajeefectividad", this.efectividad);
 		map.put("U_cantidadactividades", this.cantidadActividades);
-		map.put("U_salario", this.salario);
+//		map.put("U_salario", this.salario);
 		map.put("U_aumento", this.gratificacionesAumentos);
 
 		return map;
@@ -216,13 +216,13 @@ public class RegistroPreviewEmpleadoMensualDTO {
 		this.objetivoActividades = objetivoActividades;
 	}
 
-	public String getSalario() {
-		return salario;
-	}
-
-	public void setSalario(String salario) {
-		this.salario = salario;
-	}
+//	public String getSalario() {
+//		return salario;
+//	}
+//
+//	public void setSalario(String salario) {
+//		this.salario = salario;
+//	}
 
 	public String getCumplimientoObjetivo() {
 		return cumplimientoObjetivo;
@@ -232,13 +232,13 @@ public class RegistroPreviewEmpleadoMensualDTO {
 		this.cumplimientoObjetivo = cumplimientoObjetivo;
 	}
 
-	public String getUnidadSalario() {
-		return unidadSalario;
-	}
-
-	public void setUnidadSalario(String unidadSalario) {
-		this.unidadSalario = unidadSalario;
-	}
+//	public String getUnidadSalario() {
+//		return unidadSalario;
+//	}
+//
+//	public void setUnidadSalario(String unidadSalario) {
+//		this.unidadSalario = unidadSalario;
+//	}
 
 	public String getViaticos() {
 		return viaticos;

@@ -90,9 +90,9 @@ public class ActivityServiceImpl extends AbstractSapService implements ActivityS
 			   .append("    FORMAT(CAST(NULLIF(ISNULL(O.cantMB,0) + ISNULL(O.cantB,0),0) AS DECIMAL(10,2)) / ")
 			   .append("        CAST(((ISNULL(O.cantMB,0) * 1) + (ISNULL(O.cantB,0) * 1) + (ISNULL(O.cantR,0) * 5) + (ISNULL(O.cantM,0) * 15)) AS DECIMAL(10,2)), 'P2') AS porcentajeValoracion, ")
 			   .append("    E.U_Objetivo AS objetivoActividades, ")
-			   .append("    CAST(CAST((O.cantidadActividades * 100.0) / NULLIF(E.U_Objetivo,0) AS DECIMAL(10,2)) AS VARCHAR(10)) + '%' AS cumplimientoObjetivo, ")
-			   .append("    E.salary AS salario, ")
-			   .append("    E.salaryunit AS unidadSalario ")
+			   .append("    CAST(CAST((O.cantidadActividades * 100.0) / NULLIF(E.U_Objetivo,0) AS DECIMAL(10,2)) AS VARCHAR(10)) + '%' AS cumplimientoObjetivo ")
+//			   .append("    E.salary AS salario, ")
+//			   .append("    E.salaryunit AS unidadSalario ")
 			   .append(" FROM OTSH cab ")
 			   .append(" LEFT JOIN TSH1 det ON cab.AbsEntry = det.AbsEntry ")
 			   .append(" INNER JOIN OHEM E ON cab.UserID = E.empID ");
@@ -193,8 +193,8 @@ public class ActivityServiceImpl extends AbstractSapService implements ActivityS
 				preview.setObjetivoActividades(rs.getInt("objetivoActividades"));
 				preview.setCumplimientoObjetivo(rs.getString("cumplimientoObjetivo"));
 
-				preview.setSalario(rs.getBigDecimal("salario").toString());
-				preview.setUnidadSalario(rs.getString("unidadSalario"));
+//				preview.setSalario(rs.getBigDecimal("salario").toString());
+//				preview.setUnidadSalario(rs.getString("unidadSalario"));
 
 				Optional<Usuario> usuario = usuarios.stream()
 						.filter(x -> x.getUsuariosap().equals(preview.getUsuarioSap().toString())).findFirst();
@@ -267,10 +267,14 @@ public class ActivityServiceImpl extends AbstractSapService implements ActivityS
 			  + " AND act.recontact <= '{fechaHasta}' ".replace("{fechaHasta}", fechaHasta);
 
 		if (horaDesde != null && horaHasta != null) {
-			String[] splitDesde = horaDesde.split(":");
-			String desdeInt = new Integer(splitDesde[0] + splitDesde[1]).toString();
-			String[] splitHasta = horaHasta.split(":");
-			String hastaInt = new Integer(splitHasta[0] + splitHasta[1]).toString();
+//			String[] splitDesde = horaDesde.split(":");
+//			String desdeInt = new Integer(splitDesde[0] + splitDesde[1]).toString();
+//			String[] splitHasta = horaHasta.split(":");
+//			String hastaInt = new Integer(splitHasta[0] + splitHasta[1]).toString();
+			
+			String desdeInt = horaDesde.replace(":", "");
+			String hastaInt = horaHasta.replace(":", "");
+			
 			sql += " AND act.BeginTime >= '{horaDesde}' ".replace("{horaDesde}", desdeInt);
 			sql += " AND act.BeginTime <= '{horaHasta}' ".replace("{horaHasta}", hastaInt);
 		}

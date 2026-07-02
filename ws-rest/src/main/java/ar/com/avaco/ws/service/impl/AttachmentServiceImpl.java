@@ -36,7 +36,7 @@ public class AttachmentServiceImpl extends AbstractSapService implements Attachm
 		ResponseAttachmentGetPost currentAttach = currentAttachmentResponse.getBody();
 		return currentAttach;
 	}
-	
+
 	@Override
 	public Long enviarAttachmentsSap(List<Map<String, String>> attachments) {
 		Map<String, Object> attachmentMap = new HashMap<>();
@@ -61,5 +61,22 @@ public class AttachmentServiceImpl extends AbstractSapService implements Attachm
 		return attachmentRespose.getBody().getAbsoluteEntry();
 
 	}
-	
+
+	@Override
+	public void update(Long attachmentEntry, Map<String, Object> attPatchMap) {
+		String attachmentUrl = urlSAP + "/Attachments2({attachmentEntry})";
+		attachmentUrl = attachmentUrl.replace("{attachmentEntry}", attachmentEntry.toString());
+		HttpEntity<Map<String, Object>> httpEntityAttach = new HttpEntity<>(attPatchMap);
+		try {
+			getRestTemplate().doExchange(attachmentUrl, HttpMethod.PATCH, httpEntityAttach,
+					ResponseAttachmentGetPost.class);
+		} catch (SapBusinessException e) {
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("url", attachmentUrl);
+			errors.put("error", e.getMessage());
+			e.printStackTrace();
+			throw new ErrorValidationException("Error al ejecutar el siguiente WS", errors);
+		}
+	}
+
 }

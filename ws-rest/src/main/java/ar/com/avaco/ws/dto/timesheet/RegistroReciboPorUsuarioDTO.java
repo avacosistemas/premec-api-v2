@@ -20,6 +20,26 @@ public class RegistroReciboPorUsuarioDTO {
 
 	private String filePath;
 
+	private Boolean firmado;
+
+	private Long lineNum;
+
+	public Long getLineNum() {
+		return lineNum;
+	}
+
+	public void setLineNum(Long lineNum) {
+		this.lineNum = lineNum;
+	}
+
+	public Boolean getFirmado() {
+		return firmado;
+	}
+
+	public void setFirmado(Boolean firmado) {
+		this.firmado = firmado;
+	}
+
 	public String getFilePath() {
 		return filePath;
 	}

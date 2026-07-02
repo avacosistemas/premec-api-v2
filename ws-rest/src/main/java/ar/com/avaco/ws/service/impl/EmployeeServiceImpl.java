@@ -1,8 +1,10 @@
 package ar.com.avaco.ws.service.impl;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,31 @@ public class EmployeeServiceImpl extends AbstractSapService implements EmployeeS
 		}
 
 		return employee.getBody();
+	}
+
+	@Override
+	public void updateNetoSueldoJornal(Long employeeId, BigDecimal neto, BigDecimal sueldoJornal) {
+		
+		String urlEmployee = urlSAP + "/EmployeesInfo(" + employeeId + ")";
+		
+		Map<String, Object> updateMap = new HashMap<String, Object>();
+		updateMap.put("Salary", sueldoJornal);
+		updateMap.put("EmployeeCosts", neto);
+		
+		HttpEntity<Map<String, Object>> httpEntityAttach = new HttpEntity<>(updateMap);
+		
+		try {
+			getRestTemplate().doExchange(urlEmployee, HttpMethod.PATCH, httpEntityAttach,
+					Object.class);
+		} catch (SapBusinessException e) {
+			String fullStackTrace = SapBusinessException.generarStackTraceString(e);
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("url", urlEmployee);
+			errors.put("error", fullStackTrace);
+			e.printStackTrace();
+			throw new ErrorValidationException("Error al ejecutar el siguiente WS", errors);
+		}
+		
 	}
 
 	

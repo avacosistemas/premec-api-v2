@@ -11,4 +11,6 @@ public interface AttachmentService {
 
 	Long enviarAttachmentsSap(List<Map<String, String>> attachments);
 
+	void update(Long attachmentEntry, Map<String, Object> attPatchMap);
+
 }

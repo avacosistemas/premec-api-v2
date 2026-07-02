@@ -24,6 +24,17 @@ public class EmployeesInfoReponseSapDTO {
 	@JsonProperty("U_horafin")
 	private String horaFin;
 
+	@JsonProperty("AttachmentEntry")
+	private Long attachmentEntry;
+
+	public Long getAttachmentEntry() {
+		return attachmentEntry;
+	}
+
+	public void setAttachmentEntry(Long attachmentEntry) {
+		this.attachmentEntry = attachmentEntry;
+	}
+
 	public String getServicioTecnico() {
 		return servicioTecnico;
 	}

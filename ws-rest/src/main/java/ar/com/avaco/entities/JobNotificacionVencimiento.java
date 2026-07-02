@@ -5,7 +5,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.service.NotificacionReclamoService;
 import ar.com.avaco.service.NotificacionVencimientoService;
 
 @Service

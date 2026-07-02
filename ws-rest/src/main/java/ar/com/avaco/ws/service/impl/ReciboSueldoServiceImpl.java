@@ -17,21 +17,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import ar.com.avaco.arc.core.service.MailSenderSMTPService;
 import ar.com.avaco.arc.sec.service.UsuarioService;
@@ -39,6 +35,7 @@ import ar.com.avaco.commons.exception.ErrorValidationException;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.attachment.AttachmentLine;
 import ar.com.avaco.ws.dto.attachment.ResponseAttachmentGetPost;
+import ar.com.avaco.ws.dto.employee.EmployeesInfoReponseSapDTO;
 import ar.com.avaco.ws.dto.timesheet.ProjectManagementTimeSheetAttachDTO;
 import ar.com.avaco.ws.dto.timesheet.ReciboSueldoArchivoDTO;
 import ar.com.avaco.ws.dto.timesheet.ReciboSueldoDTO;
@@ -49,6 +46,10 @@ import ar.com.avaco.ws.service.ReciboSueldoService;
 @Service("reciboSueldoService")
 public class ReciboSueldoServiceImpl extends AbstractSapService implements ReciboSueldoService {
 
+	
+	private final String SUELDO_JORNAL = "Sueldo Jornal";
+	private final String SUELDO_MENSUAL = "Sueldo Mensual";
+	
 	@Value("${email.contador.from}")
 	private String emailFromContador;
 
@@ -70,13 +71,17 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 	@Autowired
 	private MailSenderSMTPService sender;
 
+	@Autowired
 	private UsuarioService usuarioService;
 
+	@Autowired
 	private TimeSheetService timeSheetService;
 
-	private Logger logger = Logger.getLogger(this.getClass());
-
+	@Autowired
 	private AttachmentService attachmentService;
+
+	@Autowired
+	private EmployeeService employeeService;
 
 	@Override
 	public void aprobarRecibos(List<ReciboSueldoDTO> lista) {
@@ -108,17 +113,26 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 			String to = DateUtils.toString(instance.getTime(), "yyyyMMdd");
 
 			// Busco el registros del timesheet con el periodo
-			TimeSheetEntryAttach entryAttach = this.timeSheetService.getTimeSheetEntries(new Long(usuarioSap), from,
+			Long usuarioSapLong = Long.parseLong(usuarioSap);
+			TimeSheetEntryAttach entryAttach = this.timeSheetService.getTimeSheetEntries(usuarioSapLong, from,
 					to);
 
 			// Nuevo attachment entry del project management timesheet existente
-			Long newAttachmentEntry;
+			Long newAttachmentEntry = null;
 
+			Boolean existeTimeSheet = entryAttach.getAbsEntry() != null;
+			
 			// Si no existe el registro del timesheet lo creo y obtengo el nuevo entry.
 			// El attachmententry va a ser null en este caso
-			if (entryAttach.getAbsEntry() == null) {
+			boolean esReciboJornalMensual = recibo.getTipo().equals(SUELDO_JORNAL) || recibo.getTipo().equals(SUELDO_MENSUAL);
+			if (!existeTimeSheet) {
 				// Genero el timesheet y luego obtengo el absentry
-				Long absEntry = this.timeSheetService.generarTimeSheet(new Long(usuarioSap), from, to);
+				Long absEntry = null;
+				if (esReciboJornalMensual) {
+					absEntry = this.timeSheetService.generarTimeSheet(usuarioSapLong, from, to, recibo.getNeto(), recibo.getSueldoJornal());
+				} else {
+					absEntry = this.timeSheetService.generarTimeSheet(usuarioSapLong, from, to);
+				}
 				entryAttach.setAbsEntry(absEntry);
 			}
 
@@ -163,9 +177,17 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 			// nuevo entry
 			newAttachmentEntry = this.attachmentService.enviarAttachmentsSap(attachments);
 
-			// Actualizo ProjectManagementTimeSheet
-			this.timeSheetService.updateTimeSheetAttachmentEntry(entryAttach.getAbsEntry(), newAttachmentEntry);
+			if (existeTimeSheet && esReciboJornalMensual) {
+				this.timeSheetService.updateTimeSheet(entryAttach.getAbsEntry(), newAttachmentEntry, recibo.getNeto(), recibo.getSueldoJornal());
+			} else {
+				this.timeSheetService.updateTimeSheet(entryAttach.getAbsEntry(), newAttachmentEntry);
+			}
+			
+			if (esReciboJornalMensual) {
+				employeeService.updateNetoSueldoJornal(usuarioSapLong, recibo.getNeto(), recibo.getSueldoJornal());
+			}
 
+			
 		}
 	}
 
@@ -210,6 +232,7 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 			Rectangle rectDescripcion = new Rectangle(20 + 87, (int) (pageHeight - 473 - 13), 133, 12);
 			Rectangle rectNombre = new Rectangle(20 + 87, (int) (pageHeight - 447 - 9), 192, 9);
 			Rectangle rectNeto = new Rectangle(80, 485, 80, 13);
+			Rectangle rectSueldoJornal = new Rectangle(80, (int) (pageHeight - 435 - 9), 60, 9);
 
 			PDFTextStripperByArea stripper = new PDFTextStripperByArea();
 			stripper.setSortByPosition(true);
@@ -218,6 +241,7 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 			stripper.addRegion("descripcion", rectDescripcion);
 			stripper.addRegion("nombre", rectNombre);
 			stripper.addRegion("neto", rectNeto);
+			stripper.addRegion("sueldoJornal", rectSueldoJornal);
 
 			Map<String, ReciboSueldoArchivoDTO> docsPorLegajo = new LinkedHashMap<>();
 
@@ -232,16 +256,17 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 				String descripcion = stripper.getTextForRegion("descripcion").trim();
 				String nombre = stripper.getTextForRegion("nombre").trim();
 				String textoNeto = stripper.getTextForRegion("neto").trim().replace("\\n", "").replace("\\n", "");
-
-				System.out.println(textoLegajo + " " + periodo + " " + descripcion + " " + nombre + " " + textoNeto);
+				String textoSueldoJornal = stripper.getTextForRegion("sueldoJornal").trim().replace("\\n", "")
+						.replace("\\n", "");
 
 				Long timeInMillis = Calendar.getInstance().getTimeInMillis();
 
 				Integer legajo = Integer.parseInt(textoLegajo);
 				BigDecimal neto = new BigDecimal(textoNeto.replace(",", ""));
+				BigDecimal sueldoJornal = new BigDecimal(textoSueldoJornal.replace(",", ""));
 
 				ReciboSueldoDTO recibo = new ReciboSueldoDTO(legajo, nombre, periodo, neto, tipo, descripcion,
-						timeInMillis.toString());
+						timeInMillis.toString(), sueldoJornal);
 
 				ReciboSueldoArchivoDTO recarc = docsPorLegajo.get(textoLegajo);
 
@@ -271,9 +296,9 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 				String key = recibo.getLegajo() + "_" + year + month + "_" + tipo + "_" + recibo.getTimeInMilis();
 
 				String outputDir = reciboPath + "\\" + year + month;
-				
+
 				Files.createDirectories(Paths.get(outputDir));
-				
+
 				File out = new File(outputDir, key + ".pdf");
 				pdfdoc.save(out);
 				pdfdoc.close();
@@ -281,6 +306,8 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 				recibos.add(recibo);
 			}
 
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return recibos;
@@ -307,81 +334,64 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 		return body;
 	}
 
-	@Resource(name = "usuarioService")
-	public void setUsuarioService(UsuarioService usuarioService) {
-		this.usuarioService = usuarioService;
-	}
-
 	@Override
 	public List<RegistroReciboPorUsuarioDTO> listarRecibosPorUsuario() {
 
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
-
-		String authHeader = request.getHeader("Authorization");
-
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
 		// Obtengo el usuario logueado
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		this.logger.debug("Username: " + username);
 
 		// Obtengo el usuario SAP
 		String usuarioSAP = usuarioService.getUsuarioSAPByUsername(username);
-		this.logger.debug("Usuario Sap: " + usuarioSAP);
 
 		// Si tiene usuario sap
-		if (StringUtils.isNotBlank(usuarioSAP)) {
-
-			// Busco los attachments del usuario sap
-			List<ProjectManagementTimeSheetAttachDTO> registros = this.timeSheetService
-					.listTimeSheetByUsuarioSap(new Long(usuarioSAP));
-
-			List<RegistroReciboPorUsuarioDTO> recibos = new ArrayList<>();
-
-			// Por cada registro
-			registros.stream().forEach(registro -> {
-
-				this.logger.debug("Procesando Registro: " + registro.getAttachmentEntry());
-
-				// Armo el periodo
-				int month = Integer.parseInt(registro.getDateFrom().split("-")[1]);
-				int year = Integer.parseInt(registro.getDateFrom().split("-")[0]);
-
-				Calendar instance = Calendar.getInstance();
-				instance.set(Calendar.MONTH, month - 1);
-
-				SimpleDateFormat formatoMes = new SimpleDateFormat("MMMM", new Locale("es", "ES"));
-				String monthString = formatoMes.format(instance.getTime());
-
-				// Por cada attachment que tenga el periodo (seria un recibo por attachment)
-				registro.getAttachments2().getLines().stream().forEach(tipo -> {
-					this.logger.debug("Procesando Attach: " + tipo.getFileName() + " " + tipo.getFreeText());
-
-					// Armo el registro
-					RegistroReciboPorUsuarioDTO r = new RegistroReciboPorUsuarioDTO();
-					r.setAttachmentEntry(registro.getAttachmentEntry());
-					r.setAbsEntry(tipo.getAbsoluteEntry());
-					r.setMonth(month);
-					r.setYear(year);
-					r.setMonthString(monthString);
-					r.setFilePath(tipo.getTargetPath() + "\\" + tipo.getFileName() + "." + tipo.getFileExtension());
-					int idx = tipo.getFreeText().indexOf('|');
-					String reciboTipo = (idx >= 0) ? tipo.getFreeText().substring(0, idx) : tipo.getFreeText();
-					String descripcion = (idx >= 0) ? tipo.getFreeText().substring(idx + 1, tipo.getFreeText().length())
-							: "";
-
-					r.setDescripcion(descripcion);
-					r.setTipo(reciboTipo);
-					recibos.add(r);
-
-				});
-
-			});
-			return recibos;
-		} else {
+		if (StringUtils.isBlank(usuarioSAP)) {
 			throw new ErrorValidationException("El usuario no tiene asociado usuario sap", null);
 		}
+
+		// Busco los attachments del usuario sap
+		List<ProjectManagementTimeSheetAttachDTO> registros = this.timeSheetService
+				.listTimeSheetByUsuarioSap(Long.parseLong(usuarioSAP));
+
+		List<RegistroReciboPorUsuarioDTO> recibos = new ArrayList<>();
+
+		// Por cada registro
+		registros.stream().forEach(registro -> {
+
+			// Armo el periodo
+			int month = Integer.parseInt(registro.getDateFrom().split("-")[1]);
+			int year = Integer.parseInt(registro.getDateFrom().split("-")[0]);
+
+			Calendar instance = Calendar.getInstance();
+			instance.set(Calendar.MONTH, month - 1);
+
+			SimpleDateFormat formatoMes = new SimpleDateFormat("MMMM", new Locale("es", "ES"));
+			String monthString = formatoMes.format(instance.getTime());
+
+			// Por cada attachment que tenga el periodo (seria un recibo por attachment)
+			registro.getAttachments2().getLines().stream().forEach(tipo -> {
+
+				// Armo el registro
+				RegistroReciboPorUsuarioDTO r = new RegistroReciboPorUsuarioDTO();
+				r.setAttachmentEntry(registro.getAttachmentEntry());
+				r.setAbsEntry(tipo.getAbsoluteEntry());
+				r.setMonth(month);
+				r.setYear(year);
+				r.setMonthString(monthString);
+				r.setFilePath(tipo.getTargetPath() + "\\" + tipo.getFileName() + "." + tipo.getFileExtension());
+				String freeText = tipo.getFreeText();
+				int idx = freeText.indexOf('|');
+				String reciboTipo = (idx >= 0) ? freeText.substring(0, idx) : freeText;
+				String descripcion = (idx >= 0) ? freeText.substring(idx + 1, freeText.length()) : "";
+				r.setDescripcion(descripcion);
+				r.setTipo(reciboTipo);
+				r.setFirmado(tipo.getFirmado() != null && tipo.getFirmado().equals("tYES"));
+				r.setLineNum(tipo.getLine());
+				recibos.add(r);
+
+			});
+
+		});
+		return recibos;
 	}
 
 	@Override
@@ -392,26 +402,100 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 	}
 
 	@Override
-	public byte[] obtenerReciboPDF(Long absEntry, Long attEntry) throws IOException {
+	public void firmarReciboPDF(RegistroReciboPorUsuarioDTO recibo) throws IOException {
 
-		ResponseAttachmentGetPost attachment = this.attachmentService.getAttachment(attEntry);
-		AttachmentLine line = attachment.getAttachments2Lines().stream()
-				.filter(x -> x.getAbsoluteEntry().equals(absEntry)).findAny().get();
+		Logger logger = Logger.getLogger(ReciboSueldoServiceImpl.class);
+		String name = SecurityContextHolder.getContext().getAuthentication().getName();
+		String usuarioSAP = this.usuarioService.getUsuarioSAP(name);
+		EmployeesInfoReponseSapDTO empleado = this.employeeService.getById(Long.parseLong(usuarioSAP));
 
-//		Path path = Paths.get(reciboPathServeSap + "\\" + legajo + "_" + year + month + "_" + recibo.getTipo() + ".pdf");
-		Path path = Paths.get(line.getTargetPath() + "\\" + line.getFileName() + "." + line.getFileExtension());
-		byte[] contenido = Files.readAllBytes(path);
-		return contenido;
-	}
+		ResponseAttachmentGetPost attachmentFirma = attachmentService.getAttachment(empleado.getAttachmentEntry());
+		Optional<AttachmentLine> firstFirma = attachmentFirma.getAttachments2Lines().stream()
+				.filter(x -> x.getFreeText() != null && x.getFreeText().contains("firma")).findFirst();
+		if (firstFirma.isEmpty()) {
+			throw new ErrorValidationException("Falta cargar tu firma en el sistema para poder firmar el recibo", null);
+		}
+		
+		AttachmentLine attFirma = firstFirma.get();
+		String pathFirma = attFirma.getTargetPath() + "\\" + attFirma.getFileName() + "." + attFirma.getFileExtension();
+		logger.info("Path firma: " + pathFirma);
 
-	@Resource(name = "timeSheetService")
-	public void setTimeSheetService(TimeSheetService timeSheetService) {
-		this.timeSheetService = timeSheetService;
-	}
+		ResponseAttachmentGetPost attachmentRecibo = attachmentService.getAttachment(recibo.getAttachmentEntry());
+		Optional<AttachmentLine> firstRecibo = attachmentRecibo.getAttachments2Lines().stream()
+				.filter(x -> x.getLine().equals(recibo.getLineNum())).findFirst();
+		AttachmentLine attLineRecibo = firstRecibo.get();
 
-	@Resource(name = "attachmentService")
-	public void setAttachmentService(AttachmentService attachmentService) {
-		this.attachmentService = attachmentService;
+		Path pathRecibo = Paths
+				.get((attLineRecibo.getSourcePath() + "\\" + attLineRecibo.getFileName() + "." + attLineRecibo.getFileExtension())
+						.replace("\\", "\\\\"));
+
+		File pdfFile = pathRecibo.toFile();
+
+		try {
+
+			PDDocument document = PDDocument.load(pdfFile);
+			float pageHeight = document.getPage(0).getMediaBox().getHeight();
+
+			Rectangle rectFirma = new Rectangle(280, 530, 100, 29);
+
+			for (int i = 0; i < document.getNumberOfPages(); i++) {
+
+				PDPage page = document.getPage(i);
+
+				try (PDPageContentStream contentStream = new PDPageContentStream(document, page,
+						PDPageContentStream.AppendMode.APPEND, true, true)) {
+					PDImageXObject firma = PDImageXObject.createFromFile(pathFirma, document);
+					float x = rectFirma.x;
+					float y = pageHeight - rectFirma.y - rectFirma.height;
+
+					logger.info("Dibujando firma en X=" + x + " Y=" + y + " W=" + rectFirma.width + " H="
+							+ rectFirma.height);
+
+					contentStream.drawImage(firma, x, y, rectFirma.width, rectFirma.height);
+
+					contentStream.stroke();
+
+				}
+
+			}
+			document.save(pdfFile);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("ERROR durante la firma del PDF", e);
+			throw new ErrorValidationException("Error al firmar el recibo", null);
+		}
+
+		try {
+
+			logger.info("Iniciando actualización de EDocSign");
+
+			Map<String, Object> attPatchMap = new HashMap<>();
+
+			Map<String, Object> line = new HashMap<>();
+			line.put("LineNum", recibo.getLineNum());
+			line.put("EDocSign", "tYES");
+			line.put("FileName", attLineRecibo.getFileName());
+
+			List<Map<String, Object>> attaLines = new ArrayList<>();
+			attaLines.add(line);
+
+			attPatchMap.put("Attachments2_Lines", attaLines);
+
+			logger.info("Llamando attachmentService.update()");
+
+			attachmentService.update(recibo.getAttachmentEntry(), attPatchMap);
+
+			logger.info("EDocSign actualizado correctamente");
+
+		} catch (Exception e) {
+
+			logger.error("ERROR actualizando EDocSign", e);
+
+			throw new ErrorValidationException("Error al marcar el recibo como firmado", null);
+		}
+
+		logger.info("========== FIN firmarReciboPDF ==========");
 	}
 
 }

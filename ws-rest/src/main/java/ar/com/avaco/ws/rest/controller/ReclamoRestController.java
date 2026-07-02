@@ -8,14 +8,22 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ar.com.avaco.arc.core.domain.filter.ReclamoFilterDTO;
+import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.premec.sap.dto.EstadisticaMaquinaDTO;
+import ar.com.avaco.premec.sap.dto.MachineReclamoStatsRequestDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallActivityDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallReclamoListDTO;
+import ar.com.avaco.premec.sap.service.CustomerEquipmentCardsSapService;
 import ar.com.avaco.premec.ws.service.ReclamoEPService;
+import ar.com.avaco.premec.ws.service.ReclamoEstadisticasEPService;
 import ar.com.avaco.service.NotificacionVencimientoService;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
 import ar.com.avaco.ws.service.filter.PageResponse;
@@ -25,9 +33,15 @@ public class ReclamoRestController {
 
 	@Autowired
 	private ReclamoEPService service;
+
+	@Autowired
+	private ReclamoEstadisticasEPService estadisticasService;
 	
 	@Autowired
 	private NotificacionVencimientoService vencimientoService;
+	
+	@Autowired
+	private CustomerEquipmentCardsSapService maquinaService;
 	
 	@RequestMapping(value = "/reclamo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<JSONResponse> list(ReclamoFilterDTO reclamoFilterDTO) {
@@ -63,6 +77,21 @@ public class ReclamoRestController {
 		response.setStatus(JSONResponse.OK);
 		response.setData(null);
 		return new ResponseEntity<JSONResponse>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/customer/equipment/{cuit}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<JSONResponse> getMaquinasCustomer(@RequestParam(required = false, defaultValue = "") String maquina, @PathVariable String cuit)
+			throws SapBusinessException {
+		JSONResponse response = new JSONResponse();
+		response.setData(maquinaService.listByCustomer(cuit, maquina));
+		response.setStatus(JSONResponse.OK);
+		return new ResponseEntity<JSONResponse>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("/reclamo/estadisticas/maquina-parada")
+	public ResponseEntity<?> getMachineStats(@RequestBody MachineReclamoStatsRequestDTO dto) {
+		EstadisticaMaquinaDTO estadisticasMaquinaParada = this.estadisticasService.getEstadisticasMaquinaParada(dto);
+		return ResponseEntity.ok(estadisticasMaquinaParada);
 	}
 	
 }
