@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import ar.com.avaco.arc.core.domain.filter.ReclamoFilterDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallActivityDTO;
+import ar.com.avaco.premec.sap.dto.ServiceCallCustomerStatsDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallMachineStatsDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallReclamoListDTO;
 import ar.com.avaco.utils.DateUtils;
@@ -223,17 +224,17 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 	}
 
 	@Override
-	public List<ServiceCallMachineStatsDTO> getEstadisticasMaquinaParada(String machine, String periodosJson) {
+	public List<ServiceCallMachineStatsDTO> getEstadisticasMaquinaParada(String maquinasJson, String periodosJson) {
 
 		StringBuilder sql = new StringBuilder();
 
-		sql.append("EXEC SP_GetMachineReclamoStats ?, ?");
+		sql.append("EXEC SP_GetMultipeMachineReclamoStats ?, ?");
 
 		List<ServiceCallMachineStatsDTO> result = new ArrayList<>();
 
 		try (Connection conn = sqlcon.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-			stmt.setString(1, machine);
+			stmt.setString(1, maquinasJson);
 			stmt.setString(2, periodosJson);
 
 			try (ResultSet rs = stmt.executeQuery()) {
@@ -269,6 +270,54 @@ public class ServiceCallSapServiceImpl extends AbstractSapService implements Ser
 		}
 
 		return result;
+	}
+	
+	@Override
+	public List<ServiceCallCustomerStatsDTO> getEstadisticasCliente(String clientesJson, String periodosJson) {
+
+	    StringBuilder sql = new StringBuilder();
+
+	    sql.append("EXEC SP_GetCustomerReclamoStats ?, ?");
+
+	    List<ServiceCallCustomerStatsDTO> result = new ArrayList<>();
+
+	    try (Connection conn = sqlcon.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+	        stmt.setString(1, clientesJson);
+	        stmt.setString(2, periodosJson);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+
+	            while (rs.next()) {
+
+	                ServiceCallCustomerStatsDTO dto = new ServiceCallCustomerStatsDTO();
+
+	                dto.setCliente(rs.getString("Cliente"));
+
+	                Object anioObj = rs.getObject("Anio");
+	                if (anioObj != null) {
+	                    dto.setAnio(rs.getInt("Anio"));
+	                }
+
+	                Object mesObj = rs.getObject("Mes");
+	                if (mesObj != null) {
+	                    dto.setMes(rs.getInt("Mes"));
+	                }
+
+	                dto.setCantidad(rs.getInt("Cantidad"));
+
+	                dto.setTotalGeneral(rs.getBoolean("TotalGeneral"));
+
+	                result.add(dto);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return result;
 	}
 
 }

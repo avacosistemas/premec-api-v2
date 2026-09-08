@@ -143,7 +143,7 @@ public class InformeBuilderEntrega extends InformeBuilder {
 		table.addCell(cell);
 		cell.setPhrase(new Phrase(dto.getValoracionNombreSuperior(), fontText));
 		table.addCell(cell);
-		cell.setPhrase(new Phrase(nf.format(new Double(dto.getValoracionDNISuperior())), fontText));
+		cell.setPhrase(new Phrase(nf.format(Double.valueOf(dto.getValoracionDNISuperior())), fontText));
 		table.addCell(cell);
 		cell.setBorder(0);
 
@@ -168,7 +168,7 @@ public class InformeBuilderEntrega extends InformeBuilder {
 		cell.setPhrase(new Phrase("Número", fontHeaderTable));
 		table.addCell(cell);
 	
-		cell.setPhrase(new Phrase(nf.format(new Double(dto.getNumero())), fontText));
+		cell.setPhrase(new Phrase(nf.format(Double.valueOf(dto.getNumero())), fontText));
 		table.addCell(cell);
 
 		cell.setPhrase(new Phrase("Supervisor", fontHeaderTable));
@@ -177,7 +177,7 @@ public class InformeBuilderEntrega extends InformeBuilder {
 		table.addCell(cell);
 		cell.setPhrase(new Phrase("LLamada Id", fontHeaderTable));
 		table.addCell(cell);
-		cell.setPhrase(new Phrase(nf.format(new Double(dto.getLlamadaID())), fontText));
+		cell.setPhrase(new Phrase(nf.format(Double.valueOf(dto.getLlamadaID())), fontText));
 		table.addCell(cell);
 
 		cell.setPhrase(new Phrase("Técnico", fontHeaderTable));
@@ -218,8 +218,8 @@ public class InformeBuilderEntrega extends InformeBuilder {
 		cell.setBorderColorBottom(COLOR_GRIS_BORDES);
 		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 		cell.setPadding(10);
-		cell.setPaddingLeft(new Float("7.3"));
-		cell.setPaddingRight(new Float("7.3"));
+		cell.setPaddingLeft(Float.valueOf("7.3"));
+		cell.setPaddingRight(Float.valueOf("7.3"));
 		return cell;
 	}
 

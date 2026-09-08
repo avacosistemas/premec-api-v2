@@ -13,7 +13,7 @@ public class JobNotificacionVencimiento implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 
-		NotificacionVencimientoService notificacionVencimientoService = (NotificacionVencimientoService) context.getJobDetail().getJobDataMap().get("NotificacionVencimientoService");
+		NotificacionVencimientoService notificacionVencimientoService = (NotificacionVencimientoService) context.getJobDetail().getJobDataMap().get("notificacionVencimientoService");
 		notificacionVencimientoService.enviarNotificaciones();
 		
 	}

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -32,7 +33,9 @@ import org.springframework.stereotype.Service;
 import ar.com.avaco.arc.core.service.MailSenderSMTPService;
 import ar.com.avaco.arc.sec.service.UsuarioService;
 import ar.com.avaco.commons.exception.ErrorValidationException;
+import ar.com.avaco.utils.BuscarTextoYStripper;
 import ar.com.avaco.utils.DateUtils;
+import ar.com.avaco.utils.NumberUtils;
 import ar.com.avaco.ws.dto.attachment.AttachmentLine;
 import ar.com.avaco.ws.dto.attachment.ResponseAttachmentGetPost;
 import ar.com.avaco.ws.dto.employee.EmployeesInfoReponseSapDTO;
@@ -46,10 +49,9 @@ import ar.com.avaco.ws.service.ReciboSueldoService;
 @Service("reciboSueldoService")
 public class ReciboSueldoServiceImpl extends AbstractSapService implements ReciboSueldoService {
 
-	
 	private final String SUELDO_JORNAL = "Sueldo Jornal";
 	private final String SUELDO_MENSUAL = "Sueldo Mensual";
-	
+
 	@Value("${email.contador.from}")
 	private String emailFromContador;
 
@@ -114,22 +116,23 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 
 			// Busco el registros del timesheet con el periodo
 			Long usuarioSapLong = Long.parseLong(usuarioSap);
-			TimeSheetEntryAttach entryAttach = this.timeSheetService.getTimeSheetEntries(usuarioSapLong, from,
-					to);
+			TimeSheetEntryAttach entryAttach = this.timeSheetService.getTimeSheetEntries(usuarioSapLong, from, to);
 
 			// Nuevo attachment entry del project management timesheet existente
 			Long newAttachmentEntry = null;
 
 			Boolean existeTimeSheet = entryAttach.getAbsEntry() != null;
-			
+
 			// Si no existe el registro del timesheet lo creo y obtengo el nuevo entry.
 			// El attachmententry va a ser null en este caso
-			boolean esReciboJornalMensual = recibo.getTipo().equals(SUELDO_JORNAL) || recibo.getTipo().equals(SUELDO_MENSUAL);
+			boolean esReciboJornalMensual = recibo.getTipo().equals(SUELDO_JORNAL)
+					|| recibo.getTipo().equals(SUELDO_MENSUAL);
 			if (!existeTimeSheet) {
 				// Genero el timesheet y luego obtengo el absentry
 				Long absEntry = null;
 				if (esReciboJornalMensual) {
-					absEntry = this.timeSheetService.generarTimeSheet(usuarioSapLong, from, to, recibo.getNeto(), recibo.getSueldoJornal());
+					absEntry = this.timeSheetService.generarTimeSheet(usuarioSapLong, from, to, recibo.getNeto(),
+							recibo.getSueldoJornal());
 				} else {
 					absEntry = this.timeSheetService.generarTimeSheet(usuarioSapLong, from, to);
 				}
@@ -165,7 +168,7 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 				// Luego por cada attachment armo el adjunto en la lista para volver a enviar
 				currentAttach.getAttachments2Lines().stream().forEach(att -> {
 					attachments.add(genearAttachmentReciboExistente(att.getFreeText(), usuarioSap, att.getSourcePath(),
-							att.getFileName()));
+							att.getFileName(), att.getFirmado()));
 				});
 
 				// De esta manera ya tengo los actuales y el nuevo que voy a agregar
@@ -178,16 +181,16 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 			newAttachmentEntry = this.attachmentService.enviarAttachmentsSap(attachments);
 
 			if (existeTimeSheet && esReciboJornalMensual) {
-				this.timeSheetService.updateTimeSheet(entryAttach.getAbsEntry(), newAttachmentEntry, recibo.getNeto(), recibo.getSueldoJornal());
+				this.timeSheetService.updateTimeSheet(entryAttach.getAbsEntry(), newAttachmentEntry, recibo.getNeto(),
+						recibo.getSueldoJornal());
 			} else {
 				this.timeSheetService.updateTimeSheet(entryAttach.getAbsEntry(), newAttachmentEntry);
 			}
-			
+
 			if (esReciboJornalMensual) {
 				employeeService.updateNetoSueldoJornal(usuarioSapLong, recibo.getNeto(), recibo.getSueldoJornal());
 			}
 
-			
 		}
 	}
 
@@ -203,11 +206,12 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 		fotoMap.put("UserID", usuarioSap.toString());
 		fotoMap.put("Override", "tYES");
 		fotoMap.put("FreeText", tipo + "|" + descripcion);
+		fotoMap.put("EDocSign", "tNO"); 
 		return fotoMap;
 	}
 
 	private Map<String, String> genearAttachmentReciboExistente(String tipo, String usuarioSap, String path,
-			String nombre) {
+			String nombre, String firmado) {
 		Map<String, String> fotoMap = new HashMap<String, String>();
 		fotoMap.put("SourcePath", path);
 		fotoMap.put("FileName", nombre);
@@ -215,6 +219,7 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 		fotoMap.put("UserID", usuarioSap.toString());
 		fotoMap.put("Override", "tYES");
 		fotoMap.put("FreeText", tipo);
+		fotoMap.put("EDocSign", firmado); 
 		return fotoMap;
 	}
 
@@ -224,72 +229,103 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 
 		try (PDDocument document = PDDocument.load(archivo)) {
 
+			
 			float pageHeight = document.getPage(0).getMediaBox().getHeight();
-
-			// Rect para extracción (invertido)
-			Rectangle rectLegajo = new Rectangle(20, (int) (pageHeight - 447 - 9), 84, 9);
-			Rectangle rectPeriodo = new Rectangle(20, (int) (pageHeight - 473 - 13), 84, 12);
-			Rectangle rectDescripcion = new Rectangle(20 + 87, (int) (pageHeight - 473 - 13), 133, 12);
-			Rectangle rectNombre = new Rectangle(20 + 87, (int) (pageHeight - 447 - 9), 192, 9);
-			Rectangle rectNeto = new Rectangle(80, 485, 80, 13);
-			Rectangle rectSueldoJornal = new Rectangle(80, (int) (pageHeight - 435 - 9), 60, 9);
+			
+			// Seteo las areas que se repiten en todos las hojas
+			// legajo, periodo, descripcion, nombre y sueldo/jornal
 
 			PDFTextStripperByArea stripper = new PDFTextStripperByArea();
 			stripper.setSortByPosition(true);
+			
+			Rectangle rectLegajo = new Rectangle(28, 165, 90, 12);
 			stripper.addRegion("legajo", rectLegajo);
+
+			Rectangle rectPeriodo = new Rectangle(28, 134, 90, 12);
 			stripper.addRegion("periodo", rectPeriodo);
+
+			Rectangle rectDescripcion = new Rectangle(120, 134, 236, 12);
 			stripper.addRegion("descripcion", rectDescripcion);
+
+			Rectangle rectNombre = new Rectangle(120, 165, 236, 12);
 			stripper.addRegion("nombre", rectNombre);
-			stripper.addRegion("neto", rectNeto);
+
+			Rectangle rectSueldoJornal = new Rectangle(490, 210, 100, 12);
 			stripper.addRegion("sueldoJornal", rectSueldoJornal);
 
-			Map<String, ReciboSueldoArchivoDTO> docsPorLegajo = new LinkedHashMap<>();
+			Map<Integer, ReciboSueldoArchivoDTO> docsPorLegajo = new LinkedHashMap<>();
 
+			// Por cada hoja el archivo
 			for (int i = 0; i < document.getNumberOfPages(); i++) {
 
+				// obtengo la hoja
 				PDPage page = document.getPage(i);
-
 				stripper.extractRegions(page);
 
-				String textoLegajo = stripper.getTextForRegion("legajo").replaceAll("\\s+", "").trim();
-				String periodo = stripper.getTextForRegion("periodo").trim();
-				String descripcion = stripper.getTextForRegion("descripcion").trim();
-				String nombre = stripper.getTextForRegion("nombre").trim();
-				String textoNeto = stripper.getTextForRegion("neto").trim().replace("\\n", "").replace("\\n", "");
-				String textoSueldoJornal = stripper.getTextForRegion("sueldoJornal").trim().replace("\\n", "")
-						.replace("\\n", "");
+				// Obtengo el legajo
+				Integer legajo = Integer.parseInt(stripper.getTextForRegion("legajo").replaceAll("\\s+", "").trim());
 
-				Long timeInMillis = Calendar.getInstance().getTimeInMillis();
+				// obtengo el recibo con archivo del mapa para ver si existe o no uno
+				ReciboSueldoArchivoDTO reciboConArchivo = docsPorLegajo.get(legajo);
 
-				Integer legajo = Integer.parseInt(textoLegajo);
-				BigDecimal neto = new BigDecimal(textoNeto.replace(",", ""));
-				BigDecimal sueldoJornal = new BigDecimal(textoSueldoJornal.replace(",", ""));
-
-				ReciboSueldoDTO recibo = new ReciboSueldoDTO(legajo, nombre, periodo, neto, tipo, descripcion,
-						timeInMillis.toString(), sueldoJornal);
-
-				ReciboSueldoArchivoDTO recarc = docsPorLegajo.get(textoLegajo);
-
+				ReciboSueldoDTO recibo = null;
 				PDDocument pdDocument = null;
-				if (recarc == null) {
+
+				// Si es el primero de ese legajo
+				if (reciboConArchivo == null) {
+					
+					// Creo el documento
 					pdDocument = new PDDocument();
+
+					// Obtengo los valores de las areas
+					String periodo = stripper.getTextForRegion("periodo").trim();
+					String descripcion = stripper.getTextForRegion("descripcion").trim();
+					String nombre = stripper.getTextForRegion("nombre").trim();
+					
+					String textoSueldoJornal = stripper.getTextForRegion("sueldoJornal").trim().replace("\\n", "");
+					BigDecimal sueldoJornal = NumberUtils.parseMonto(textoSueldoJornal);
+					
+					Long timeInMillis = Calendar.getInstance().getTimeInMillis();
+
+//					BuscarTextoYStripper buscador = new BuscarTextoYStripper("SUELDO NETO:");
+//
+//					buscador.setStartPage(i + 1);
+//					buscador.setEndPage(i + 1);
+//					buscador.getText(document);
+//					
+//					String textoNeto = buscador.getTextoEcontrado().split(":")[1].trim().replace("\\n", "");
+//					BigDecimal neto = NumberUtils.parseMonto(textoNeto);
+					
+					// Creo el recibo
+					recibo = new ReciboSueldoDTO(legajo, nombre, periodo, null, tipo, descripcion, timeInMillis.toString(), sueldoJornal);
+					
 				} else {
-					pdDocument = recarc.getDocument();
+					// Si no es el priemro
+					// Obtengo el documento existente
+					pdDocument = reciboConArchivo.getDocument();
+					// Obtengo el recibo ya creado
+					recibo = reciboConArchivo.getReciboSueldo();
 				}
 
+				// Le agrego la hoja
 				pdDocument.addPage(page);
 
-				recarc = new ReciboSueldoArchivoDTO(recibo, pdDocument);
+				// Armo otra vez el recibo con archivo
+				reciboConArchivo = new ReciboSueldoArchivoDTO(recibo, pdDocument);
 
-				docsPorLegajo.put(textoLegajo, recarc);
+				// Lo incluyo en el mapa
+				docsPorLegajo.put(legajo, reciboConArchivo);
 
 			}
 
-			for (Map.Entry<String, ReciboSueldoArchivoDTO> entry : docsPorLegajo.entrySet()) {
+			for (Map.Entry<Integer, ReciboSueldoArchivoDTO> entry : docsPorLegajo.entrySet()) {
 
 				ReciboSueldoDTO recibo = entry.getValue().getReciboSueldo();
 				PDDocument pdfdoc = entry.getValue().getDocument();
 
+				 // Busco el neto en todas las páginas que pertenecen a este legajo
+			    recibo.setNeto(obtenerSueldoNeto(pdfdoc));
+				
 				String month = recibo.getPeriodo().split("/")[0];
 				String year = recibo.getPeriodo().split("/")[1];
 
@@ -312,6 +348,148 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 
 		return recibos;
 	}
+
+	/**
+	 * Busca el texto "SUELDO NETO:" en todas las páginas del recibo
+	 * y devuelve el importe encontrado.
+	 */
+	private BigDecimal obtenerSueldoNeto(PDDocument document) throws IOException {
+
+	    // Creo el buscador indicando el texto a localizar
+	    BuscarTextoYStripper buscador = new BuscarTextoYStripper("SUELDO NETO:");
+
+	    // Recorro todas las páginas del documento
+	    buscador.setStartPage(1);
+	    buscador.setEndPage(document.getNumberOfPages());
+
+	    // Ejecuta la búsqueda
+	    buscador.getText(document);
+
+	    // Obtengo el texto completo de la línea encontrada
+	    String textoEncontrado = buscador.getTextoEcontrado();
+
+	    if (textoEncontrado == null || textoEncontrado.trim().isEmpty()) {
+	        throw new RuntimeException("No se encontró el texto 'SUELDO NETO:' en el recibo.");
+	    }
+
+	    // Ejemplo:
+	    // "SUELDO NETO: 1.234.567,89"
+	    int indiceDosPuntos = textoEncontrado.indexOf(':');
+
+	    if (indiceDosPuntos < 0) {
+	        throw new RuntimeException(
+	            "Se encontró 'SUELDO NETO' pero no se pudo extraer el importe. Texto: "
+	            + textoEncontrado);
+	    }
+
+	    String textoNeto = textoEncontrado
+	            .substring(indiceDosPuntos + 1)
+	            .trim()
+	            .replace("\n", "")
+	            .replace("\r", "");
+
+	    return NumberUtils.parseMonto(textoNeto);
+	}
+	
+//  Metodo usado hasta junio 2026
+//  Metodo usado hasta junio 2026
+//  Metodo usado hasta junio 2026
+//  Metodo usado hasta junio 2026
+//	
+//	@Override
+//	public List<ReciboSueldoDTO> procesarRecibos(String tipo, byte[] archivo) throws IOException {
+//		List<ReciboSueldoDTO> recibos = new ArrayList<>();
+//		
+//		try (PDDocument document = PDDocument.load(archivo)) {
+//			
+//			float pageHeight = document.getPage(0).getMediaBox().getHeight();
+//			
+//			// Rect para extracción (invertido)
+//			Rectangle rectLegajo = new Rectangle(20, (int) (pageHeight - 447 - 9), 84, 9);
+//			Rectangle rectPeriodo = new Rectangle(20, (int) (pageHeight - 473 - 13), 84, 12);
+//			Rectangle rectDescripcion = new Rectangle(20 + 87, (int) (pageHeight - 473 - 13), 133, 12);
+//			Rectangle rectNombre = new Rectangle(20 + 87, (int) (pageHeight - 447 - 9), 192, 9);
+//			Rectangle rectNeto = new Rectangle(80, 485, 80, 13);
+//			Rectangle rectSueldoJornal = new Rectangle(80, (int) (pageHeight - 435 - 9), 60, 9);
+//			
+//			PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+//			stripper.setSortByPosition(true);
+//			stripper.addRegion("legajo", rectLegajo);
+//			stripper.addRegion("periodo", rectPeriodo);
+//			stripper.addRegion("descripcion", rectDescripcion);
+//			stripper.addRegion("nombre", rectNombre);
+//			stripper.addRegion("neto", rectNeto);
+//			stripper.addRegion("sueldoJornal", rectSueldoJornal);
+//			
+//			Map<String, ReciboSueldoArchivoDTO> docsPorLegajo = new LinkedHashMap<>();
+//			
+//			for (int i = 0; i < document.getNumberOfPages(); i++) {
+//				
+//				PDPage page = document.getPage(i);
+//				
+//				stripper.extractRegions(page);
+//				
+//				String textoLegajo = stripper.getTextForRegion("legajo").replaceAll("\\s+", "").trim();
+//				String periodo = stripper.getTextForRegion("periodo").trim();
+//				String descripcion = stripper.getTextForRegion("descripcion").trim();
+//				String nombre = stripper.getTextForRegion("nombre").trim();
+//				String textoNeto = stripper.getTextForRegion("neto").trim().replace("\\n", "").replace("\\n", "");
+//				String textoSueldoJornal = stripper.getTextForRegion("sueldoJornal").trim().replace("\\n", "")
+//						.replace("\\n", "");
+//				
+//				Long timeInMillis = Calendar.getInstance().getTimeInMillis();
+//				
+//				Integer legajo = Integer.parseInt(textoLegajo);
+//				BigDecimal neto = new BigDecimal(textoNeto.replace(",", ""));
+//				BigDecimal sueldoJornal = new BigDecimal(textoSueldoJornal.replace(",", ""));
+//				
+//				ReciboSueldoDTO recibo = new ReciboSueldoDTO(legajo, nombre, periodo, neto, tipo, descripcion,
+//						timeInMillis.toString(), sueldoJornal);
+//				
+//				ReciboSueldoArchivoDTO recarc = docsPorLegajo.get(textoLegajo);
+//				
+//				PDDocument pdDocument = null;
+//				if (recarc == null) {
+//					pdDocument = new PDDocument();
+//				} else {
+//					pdDocument = recarc.getDocument();
+//				}
+//				
+//				pdDocument.addPage(page);
+//				
+//				recarc = new ReciboSueldoArchivoDTO(recibo, pdDocument);
+//				
+//				docsPorLegajo.put(textoLegajo, recarc);
+//				
+//			}
+//			
+//			for (Map.Entry<String, ReciboSueldoArchivoDTO> entry : docsPorLegajo.entrySet()) {
+//				
+//				ReciboSueldoDTO recibo = entry.getValue().getReciboSueldo();
+//				PDDocument pdfdoc = entry.getValue().getDocument();
+//				
+//				String month = recibo.getPeriodo().split("/")[0];
+//				String year = recibo.getPeriodo().split("/")[1];
+//				
+//				String key = recibo.getLegajo() + "_" + year + month + "_" + tipo + "_" + recibo.getTimeInMilis();
+//				
+//				String outputDir = reciboPath + "\\" + year + month;
+//				
+//				Files.createDirectories(Paths.get(outputDir));
+//				
+//				File out = new File(outputDir, key + ".pdf");
+//				pdfdoc.save(out);
+//				pdfdoc.close();
+//				
+//				recibos.add(recibo);
+//			}
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return recibos;
+//	}
 
 	@Override
 	public void rechazarRecibos(List<ReciboSueldoDTO> lista) {
@@ -415,7 +593,7 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 		if (firstFirma.isEmpty()) {
 			throw new ErrorValidationException("Falta cargar tu firma en el sistema para poder firmar el recibo", null);
 		}
-		
+
 		AttachmentLine attFirma = firstFirma.get();
 		String pathFirma = attFirma.getTargetPath() + "\\" + attFirma.getFileName() + "." + attFirma.getFileExtension();
 		logger.info("Path firma: " + pathFirma);
@@ -425,9 +603,8 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 				.filter(x -> x.getLine().equals(recibo.getLineNum())).findFirst();
 		AttachmentLine attLineRecibo = firstRecibo.get();
 
-		Path pathRecibo = Paths
-				.get((attLineRecibo.getSourcePath() + "\\" + attLineRecibo.getFileName() + "." + attLineRecibo.getFileExtension())
-						.replace("\\", "\\\\"));
+		Path pathRecibo = Paths.get((attLineRecibo.getSourcePath() + "\\" + attLineRecibo.getFileName() + "."
+				+ attLineRecibo.getFileExtension()).replace("\\", "\\\\"));
 
 		File pdfFile = pathRecibo.toFile();
 
@@ -435,8 +612,16 @@ public class ReciboSueldoServiceImpl extends AbstractSapService implements Recib
 
 			PDDocument document = PDDocument.load(pdfFile);
 			float pageHeight = document.getPage(0).getMediaBox().getHeight();
-
+			
+			// Hasta Mayo 2026 inclusive
 			Rectangle rectFirma = new Rectangle(280, 530, 100, 29);
+			
+			LocalDate junio2026Date = LocalDate.of(2026, 5, 1);
+			LocalDate periodoDate = LocalDate.of(recibo.getYear(), recibo.getMonth(), 1);
+			
+			// A partir de Junio 2026
+			if (periodoDate.isAfter(junio2026Date))
+				rectFirma = new Rectangle(113, 733, 100, 29);
 
 			for (int i = 0; i < document.getNumberOfPages(); i++) {
 

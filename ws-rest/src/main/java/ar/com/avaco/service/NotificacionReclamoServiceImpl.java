@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -101,6 +102,12 @@ public class NotificacionReclamoServiceImpl implements NotificacionReclamoServic
 			// Envío
 			String to = item.getCustomerEmail();
 
+			if (StringUtils.isBlank(to)) {
+				to = "reportesservicios@premecsa.com.ar";
+				String warning = "<strong style='color: red;'>Contrato sin email asignado</strong><br><br>";
+				body = warning + body;
+			}
+			
 			if (test)
 				to = mailTest;
 

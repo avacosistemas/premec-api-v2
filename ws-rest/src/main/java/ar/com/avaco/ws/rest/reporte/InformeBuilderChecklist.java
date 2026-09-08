@@ -77,6 +77,9 @@ public class InformeBuilderChecklist extends InformeBuilder {
 
 			addFooter(document);
 
+			addFirma(document);
+			
+
 		} catch (DocumentException e) {
 			e.printStackTrace();
 			throw e;
@@ -89,6 +92,67 @@ public class InformeBuilderChecklist extends InformeBuilder {
 		return new ResponseEntity<JSONResponse>(response, HttpStatus.OK);
 	}
 
+	private void addFirma(Document document) throws DocumentException {
+
+	    Image firmaImage = getFirmaImage();
+
+	    // Ajustar tamaño de la firma
+	    firmaImage.scaleToFit(150f, 90f);
+	    firmaImage.setAlignment(Image.ALIGN_CENTER);
+
+	    // Tabla con los datos
+	    PdfPTable tableFirmaSello = new PdfPTable(1);
+	    tableFirmaSello.setWidthPercentage(100);
+
+	    PdfPCell cell;
+
+	    cell = new PdfPCell(new Phrase("PREMEC S.A.", fontText));
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	    cell.setPadding(0);
+	    tableFirmaSello.addCell(cell);
+
+	    cell = new PdfPCell(new Phrase("Walter Benitez", fontText));
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	    cell.setPadding(0);
+	    tableFirmaSello.addCell(cell);
+
+	    cell = new PdfPCell(new Phrase("GERENTE TECNICO", fontText));
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	    cell.setPadding(0);
+	    tableFirmaSello.addCell(cell);
+
+	    // Celda de la firma
+	    PdfPCell firmaCell = new PdfPCell(firmaImage, false);
+	    firmaCell.setBorder(Rectangle.NO_BORDER);
+	    firmaCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	    firmaCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+	    firmaCell.setPaddingBottom(5);
+
+	    // Celda con los textos
+	    PdfPCell textoCell = new PdfPCell(tableFirmaSello);
+	    textoCell.setBorder(Rectangle.NO_BORDER);
+	    textoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+	    // Tabla principal
+	    PdfPTable tableFirma = new PdfPTable(1);
+	    tableFirma.setWidthPercentage(30);
+	    tableFirma.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+	    PdfPCell wrapper = new PdfPCell();
+	    wrapper.setBorder(Rectangle.NO_BORDER);
+	    wrapper.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+	    wrapper.addElement(firmaImage);
+	    wrapper.addElement(tableFirmaSello);
+
+	    tableFirma.addCell(wrapper);
+
+	    document.add(tableFirma);
+	}
+
 	private PdfPCell getPDFPCell() {
 		PdfPCell cell = new PdfPCell();
 		cell.setUseAscender(true);
@@ -98,8 +162,8 @@ public class InformeBuilderChecklist extends InformeBuilder {
 		cell.setBorderColorBottom(COLOR_GRIS_BORDES);
 		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 		cell.setPadding(3);
-		cell.setPaddingLeft(new Float("7.3"));
-		cell.setPaddingRight(new Float("7.3"));
+		cell.setPaddingLeft(Float.valueOf("7.3"));
+		cell.setPaddingRight(Float.valueOf("7.3"));
 		return cell;
 	}
 
@@ -116,8 +180,8 @@ public class InformeBuilderChecklist extends InformeBuilder {
 		cell.setBorderColorRight(COLOR_GRIS_BORDES);
 		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 		cell.setPadding(3);
-		cell.setPaddingLeft(new Float("7.3"));
-		cell.setPaddingRight(new Float("7.3"));
+		cell.setPaddingLeft(Float.valueOf("7.3"));
+		cell.setPaddingRight(Float.valueOf("7.3"));
 		return cell;
 	}
 
@@ -134,8 +198,8 @@ public class InformeBuilderChecklist extends InformeBuilder {
 		cell.setBorderColorRight(COLOR_GRIS_BORDES);
 		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 		cell.setPadding(8);
-		cell.setPaddingLeft(new Float("7.3"));
-		cell.setPaddingRight(new Float("7.3"));
+		cell.setPaddingLeft(Float.valueOf("7.3"));
+		cell.setPaddingRight(Float.valueOf("7.3"));
 		cell.setBackgroundColor(new BaseColor(238, 238, 238));
 		return cell;
 	}
@@ -363,6 +427,21 @@ public class InformeBuilderChecklist extends InformeBuilder {
 	private Image getCheckImage() {
 		ClassLoader classLoader = getClass().getClassLoader();
 		URL resourcecheck = classLoader.getResource("check.png");
+		Image imagecheck = null;
+		try {
+			File filecheck = new File(resourcecheck.toURI());
+			imagecheck = Image.getInstance(filecheck.getAbsolutePath());
+			imagecheck.scaleToFit(15, 15);
+			imagecheck.setAlignment(Element.ALIGN_CENTER);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return imagecheck;
+	}
+
+	private Image getFirmaImage() {
+		ClassLoader classLoader = getClass().getClassLoader();
+		URL resourcecheck = classLoader.getResource("firmawalter.png");
 		Image imagecheck = null;
 		try {
 			File filecheck = new File(resourcecheck.toURI());

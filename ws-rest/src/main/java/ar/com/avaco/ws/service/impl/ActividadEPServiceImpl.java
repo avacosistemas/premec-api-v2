@@ -1281,7 +1281,7 @@ public class ActividadEPServiceImpl extends AbstractSapService implements Activi
 				LocalDateTime date1 = LocalDateTime.ofInstant(fechaActual.toInstant(), ZoneId.systemDefault());
 				LocalDateTime date2 = LocalDateTime.ofInstant(fechaAnterior.toInstant(), ZoneId.systemDefault());
 
-				double diasDouble = new Double(Duration.between(date2, date1).toDays());
+				long diasDouble = Duration.between(date2, date1).toDays();
 
 				Double horasMaquinaAnterior = anterior.getHorasMaquina();
 
@@ -1297,7 +1297,7 @@ public class ActividadEPServiceImpl extends AbstractSapService implements Activi
 
 						Double promedio = horasDouble / diasDouble;
 
-						Double promedioMax = new Double(registro.getHorasContratadas()) / (double) 30;
+						Double promedioMax = registro.getHorasContratadas() / (double) 30;
 
 						// Si el promedio es factible lo calculo
 						if (Double.isFinite(promedio)) {
@@ -1338,7 +1338,7 @@ public class ActividadEPServiceImpl extends AbstractSapService implements Activi
 
 			double horasDouble = ultimo.getHorasMaquina() - primero.getHorasMaquina();
 
-			double mesesDouble = new Double(Duration.between(date2, date1).toDays());
+			double mesesDouble = Duration.between(date2, date1).toDays();
 
 			// Si no hay más de 1 mes de diferencia no hay promedio general
 			if (mesesDouble <= 1) {
@@ -1348,7 +1348,7 @@ public class ActividadEPServiceImpl extends AbstractSapService implements Activi
 				Double promedio = (horasDouble / mesesDouble) * 30;
 				promedioGeneral.setPromedio(new BigDecimal(promedio.toString()).setScale(2, 1).doubleValue());
 
-				Double promedioMax = new Double(ultimo.getHorasContratadas());
+				Double promedioMax = Double.valueOf(ultimo.getHorasContratadas());
 
 				if (promedio > promedioMax) {
 					promedioGeneral.setPromedioString("Posible Superación Hs. Máquina Mensual");

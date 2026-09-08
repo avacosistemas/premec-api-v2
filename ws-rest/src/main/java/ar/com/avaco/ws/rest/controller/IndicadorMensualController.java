@@ -2,8 +2,6 @@ package ar.com.avaco.ws.rest.controller;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +16,7 @@ import ar.com.avaco.premec.dto.RegistroInformeMensualEmpleadoDTO;
 import ar.com.avaco.premec.dto.RegistroInformeMensualEmpleadoIndividualDTO;
 import ar.com.avaco.premec.dto.RegistroInformeMensualGeneralDTO;
 import ar.com.avaco.premec.service.IndicadorMensualService;
-import ar.com.avaco.ws.dto.actividad.RegistroPreviewEmpleadoMensualDTO;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
-import ar.com.avaco.ws.service.CierreMesService;
 
 @Controller
 public class IndicadorMensualController {

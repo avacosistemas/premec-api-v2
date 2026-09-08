@@ -378,8 +378,8 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 			LocalDateTime date1 = LocalDateTime.ofInstant(fechaActual.toInstant(), ZoneId.systemDefault());
 			LocalDateTime date2 = LocalDateTime.ofInstant(fechaAnterior.toInstant(), ZoneId.systemDefault());
 
-			double diasDouble = Math.abs(new Long(Duration.between(date1, date2).toDays()).doubleValue());
-			double horasDouble = new Long(horasMaquina - hsMaqAnterior);
+			double diasDouble = Math.abs(Duration.between(date1, date2).toDays());
+			double horasDouble = horasMaquina - hsMaqAnterior;
 
 			if (horasDouble < 0) {
 
@@ -387,8 +387,8 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 				RegistroHorasMaquinaExcedidaReseteo entity = new RegistroHorasMaquinaExcedidaReseteo();
 				entity.setFechaActual(fechaActual);
 				entity.setFechaAnterior(fechaAnterior);
-				entity.setHorasMaquinaActual(new Double(horasMaquina));
-				entity.setHsMaqAnterior(new Double(hsMaqAnterior));
+				entity.setHorasMaquinaActual(Double.valueOf(horasMaquina));
+				entity.setHsMaqAnterior(Double.valueOf(hsMaqAnterior));
 				entity.setInternalSerialNum(internalSerialNum);
 				entity.setMaximoMensual(maxmensual);
 				entity.setPromedio(null);
@@ -401,7 +401,7 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 
 				double promedio = horasDouble / diasDouble;
 
-				double promedioMax = new Double(maxmensual) / (double) 30;
+				double promedioMax = maxmensual / (double) 30;
 
 				double exceso = Math.round((promedio - promedioMax) * diasDouble);
 
@@ -411,8 +411,8 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 					RegistroHorasMaquinaExcedidaReseteo entity = new RegistroHorasMaquinaExcedidaReseteo();
 					entity.setFechaActual(fechaActual);
 					entity.setFechaAnterior(fechaAnterior);
-					entity.setHorasMaquinaActual(new Double(horasMaquina));
-					entity.setHsMaqAnterior(new Double(hsMaqAnterior));
+					entity.setHorasMaquinaActual(Double.valueOf(horasMaquina));
+					entity.setHsMaqAnterior(Double.valueOf(hsMaqAnterior));
 					entity.setInternalSerialNum(internalSerialNum);
 					entity.setMaximoMensual(maxmensual);
 					entity.setPromedio(promedio);
@@ -1018,7 +1018,7 @@ public class FormularioEPServiceImpl extends AbstractSapService implements Formu
 
 						attachmentRespose = getRestTemplate().doExchange(attachmentUrl, HttpMethod.POST,
 								httpEntityAttach, Object.class);
-						Object object = ((Map) attachmentRespose.getBody()).entrySet().toArray()[1];
+						Object object = ((Map<?, ?>) attachmentRespose.getBody()).entrySet().toArray()[1];
 
 						// Obtengo el nuevo attachment entry a setear en la actividad
 						String attchEntry = (object.toString().split("="))[1];

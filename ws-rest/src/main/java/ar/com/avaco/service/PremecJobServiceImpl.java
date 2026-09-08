@@ -105,7 +105,7 @@ public class PremecJobServiceImpl implements PremecJobService {
 					.withIdentity("notificacionVencimientoJob", "notificacionVencimientoGroup").usingJobData(newJobDataMap).build();
 			Trigger triggerNotificacionVencimiento = TriggerBuilder.newTrigger()
 					.withIdentity("notificacionVencimientoTrigger", "notificacionVencimientoGroup")
-					.withSchedule(CronScheduleBuilder.cronSchedule(cronNotificacionReclamos)).build();
+					.withSchedule(CronScheduleBuilder.cronSchedule(cronNotificacionVencimiento)).build();
 			scheduler.scheduleJob(jobNotificacionVencimientos, triggerNotificacionVencimiento);
 			
 			
