@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import ar.com.avaco.factory.SapBusinessException;
 import ar.com.avaco.premec.dto.ReclamoFilterDTO;
 import ar.com.avaco.premec.sap.dto.CustomerReclamoStatsRequestDTO;
 import ar.com.avaco.premec.sap.dto.EstadisticaClienteDTO;
@@ -23,6 +22,7 @@ import ar.com.avaco.premec.sap.dto.EstadisticaMaquinaDTO;
 import ar.com.avaco.premec.sap.dto.MachineReclamoStatsRequestDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallActivityDTO;
 import ar.com.avaco.premec.sap.dto.ServiceCallReclamoListDTO;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.premec.sap.service.CustomerEquipmentCardsSapService;
 import ar.com.avaco.premec.ws.service.ReclamoEPService;
 import ar.com.avaco.premec.ws.service.ReclamoEstadisticasEPService;

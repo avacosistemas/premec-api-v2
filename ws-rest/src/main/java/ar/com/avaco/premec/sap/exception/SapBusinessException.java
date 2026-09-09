@@ -1,4 +1,4 @@
-package ar.com.avaco.factory;
+package ar.com.avaco.premec.sap.exception;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

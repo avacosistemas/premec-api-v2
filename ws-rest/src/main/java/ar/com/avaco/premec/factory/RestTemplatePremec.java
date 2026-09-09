@@ -1,4 +1,4 @@
-package ar.com.avaco.factory;
+package ar.com.avaco.premec.factory;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ar.com.avaco.premec.sap.error.SapErrorResponseDTO;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 
 public class RestTemplatePremec extends RestTemplate {
 

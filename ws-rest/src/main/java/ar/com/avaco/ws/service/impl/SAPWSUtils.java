@@ -10,9 +10,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import ar.com.avaco.factory.ParentObjectIdNotFoundException;
-import ar.com.avaco.factory.RestTemplatePremec;
-import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.fwk.core.exception.ParentObjectIdNotFoundException;
+import ar.com.avaco.premec.factory.RestTemplatePremec;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 
 public class SAPWSUtils {
 

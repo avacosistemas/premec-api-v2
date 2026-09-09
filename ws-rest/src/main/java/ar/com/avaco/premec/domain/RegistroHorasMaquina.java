@@ -1,4 +1,4 @@
-package ar.com.avaco.entities;
+package ar.com.avaco.premec.domain;
 
 import java.util.Date;
 

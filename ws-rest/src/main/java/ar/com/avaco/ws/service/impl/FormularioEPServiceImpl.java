@@ -45,10 +45,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import ar.com.avaco.entities.RegistroHorasMaquinaExcedidaReseteo;
-import ar.com.avaco.factory.ParentObjectIdNotFoundException;
-import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.fwk.core.exception.ParentObjectIdNotFoundException;
 import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
+import ar.com.avaco.premec.domain.RegistroHorasMaquinaExcedidaReseteo;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.premec.service.RegistroHorasMaquinaExcedidaReseteoService;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.actividad.ActividadPatch;

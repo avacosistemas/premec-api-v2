@@ -22,7 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import ar.com.avaco.commons.exception.ErrorValidationException;
-import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.ws.dto.timesheet.ProjectManagementTimeSheetAttachDTO;
 import ar.com.avaco.ws.dto.timesheet.ProjectManagementTimeSheetAttachResponse;
 import ar.com.avaco.ws.dto.timesheet.ProjectManagementTimeSheetGetDTO;

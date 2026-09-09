@@ -1,4 +1,4 @@
-package ar.com.avaco.factory;
+package ar.com.avaco.premec.sap.exception;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

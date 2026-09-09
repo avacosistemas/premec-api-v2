@@ -5,7 +5,7 @@ import javax.annotation.Resource;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.entities.RegistroHorasMaquinaExcedidaReseteo;
+import ar.com.avaco.premec.domain.RegistroHorasMaquinaExcedidaReseteo;
 import ar.com.avaco.premec.service.RegistroHorasMaquinaExcedidaReseteoService;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.RegistroHorasMaquinaExcedidaReseteoDTO;

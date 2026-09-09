@@ -1,15 +1,12 @@
 /**
  * 
  */
-package ar.com.avaco.filter;
+package ar.com.avaco.fwk.core.domain.filter;
 
 import java.util.List;
 import java.util.Map;
 
 import ar.com.avaco.commons.domain.FieldDef;
-import ar.com.avaco.fwk.core.domain.filter.AbstractFilter;
-import ar.com.avaco.fwk.core.domain.filter.FilterData;
-import ar.com.avaco.fwk.core.domain.filter.FilterDataType;
 
 /**
  * @author avaco

@@ -21,10 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.entities.JobEnvioFormularioSap;
-import ar.com.avaco.entities.JobNotificacionReclamos;
-import ar.com.avaco.entities.JobNotificacionVencimiento;
-import ar.com.avaco.entities.JobReporteDiario;
+import ar.com.avaco.premec.jobs.JobEnvioFormularioSap;
+import ar.com.avaco.premec.jobs.JobNotificacionReclamos;
+import ar.com.avaco.premec.jobs.JobNotificacionVencimiento;
+import ar.com.avaco.premec.jobs.JobReporteDiario;
 import ar.com.avaco.ws.service.ActividadEPService;
 import ar.com.avaco.ws.service.FormularioEPService;
 import ar.com.avaco.ws.service.ReporteEPService;

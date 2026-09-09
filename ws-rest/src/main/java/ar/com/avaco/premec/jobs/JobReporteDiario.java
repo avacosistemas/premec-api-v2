@@ -1,4 +1,4 @@
-package ar.com.avaco.entities;
+package ar.com.avaco.premec.jobs;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.ws.dto.actividad.ActividadReporteDTO;
 import ar.com.avaco.ws.service.ActividadEPService;
 import ar.com.avaco.ws.service.ReporteEPService;

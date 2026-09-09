@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import ar.com.avaco.commons.exception.ErrorValidationException;
-import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.ws.dto.attachment.ResponseAttachmentGetPost;
 import ar.com.avaco.ws.service.AbstractSapService;
 

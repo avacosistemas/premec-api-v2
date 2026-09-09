@@ -1,4 +1,4 @@
-package ar.com.avaco.factory;
+package ar.com.avaco.premec.factory;
 
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -20,6 +20,8 @@ import org.springframework.web.client.RestClientException;
 
 import ar.com.avaco.premec.dto.PostLoginSAPDTO;
 import ar.com.avaco.premec.dto.ResponseLoginSAPDTO;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
+import ar.com.avaco.premec.sap.exception.SapResponseErrorHandler;
 
 public class RestTemplateFactory {
 

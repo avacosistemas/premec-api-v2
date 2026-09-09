@@ -8,8 +8,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.factory.SapBusinessException;
 import ar.com.avaco.premec.sap.dto.BusinessPartnerResponseDTO;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.ws.service.AbstractSapService;
 
 @Service("businessPartnerService")

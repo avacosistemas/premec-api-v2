@@ -1,4 +1,4 @@
-package ar.com.avaco.entities;
+package ar.com.avaco.premec.jobs;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;

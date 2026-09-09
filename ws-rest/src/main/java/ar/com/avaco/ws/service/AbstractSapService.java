@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.google.gson.Gson;
 
-import ar.com.avaco.factory.RestTemplateFactory;
-import ar.com.avaco.factory.RestTemplatePremec;
+import ar.com.avaco.premec.factory.RestTemplateFactory;
+import ar.com.avaco.premec.factory.RestTemplatePremec;
 
 public abstract class AbstractSapService {
 

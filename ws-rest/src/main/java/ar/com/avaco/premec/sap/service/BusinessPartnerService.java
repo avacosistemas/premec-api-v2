@@ -1,7 +1,7 @@
 package ar.com.avaco.premec.sap.service;
 
-import ar.com.avaco.factory.SapBusinessException;
 import ar.com.avaco.premec.sap.dto.BusinessPartnerResponseDTO;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 
 public interface BusinessPartnerService {
 

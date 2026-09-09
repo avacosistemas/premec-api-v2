@@ -1,4 +1,4 @@
-package ar.com.avaco.factory;
+package ar.com.avaco.fwk.core.exception;
 
 /**
  * Exception que se lanza cuando se quiere obtener el parent object id de una

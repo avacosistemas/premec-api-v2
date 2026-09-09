@@ -19,9 +19,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.factory.SapBusinessException;
 import ar.com.avaco.premec.sap.DTOList;
 import ar.com.avaco.premec.sap.dto.CustomerEquipmentCardsItemListDTO;
+import ar.com.avaco.premec.sap.exception.SapBusinessException;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.service.AbstractSapService;
 import ar.com.avaco.ws.service.impl.SQLServerConnection;
