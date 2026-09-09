@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "ITEM_CHECKLIST_GRUPO")
 @SequenceGenerator(name = "ITEM_CHECKLIST_GRUPO_SEQ", sequenceName = "ITEM_CHECKLIST_GRUPO_SEQ", allocationSize = 1)
-public class ItemChecklistGrupo extends ar.com.avaco.arc.core.domain.Entity<Long> {
+public class ItemChecklistGrupo extends ar.com.avaco.fwk.core.domain.Entity<Long> {
 
 	private static final long serialVersionUID = -3260414467249766837L;
 

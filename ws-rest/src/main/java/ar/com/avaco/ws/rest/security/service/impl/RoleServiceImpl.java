@@ -8,8 +8,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Rol;
-import ar.com.avaco.arc.sec.service.RolService;
+import ar.com.avaco.fwk.security.domain.Rol;
+import ar.com.avaco.fwk.security.service.RolService;
 import ar.com.avaco.ws.rest.security.dto.Role;
 import ar.com.avaco.ws.rest.security.service.RoleService;
 import ar.com.avaco.ws.service.AbstractConvertService;

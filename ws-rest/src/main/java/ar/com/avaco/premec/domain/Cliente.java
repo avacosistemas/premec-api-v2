@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "CLIENTE")
 @SequenceGenerator(name = "CLIENTE_SEQ", sequenceName = "CLIENTE_SEQ", allocationSize = 1)
-public class Cliente extends ar.com.avaco.arc.core.domain.Entity<Long> {
+public class Cliente extends ar.com.avaco.fwk.core.domain.Entity<Long> {
 
 	private static final long serialVersionUID = 4015134588869901551L;
 	@Id

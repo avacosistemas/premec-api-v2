@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.avaco.arc.core.domain.filter.AbstractFilter;
-import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.commons.exception.BusinessException;
+import ar.com.avaco.fwk.core.domain.filter.AbstractFilter;
+import ar.com.avaco.fwk.security.domain.Usuario;
 import ar.com.avaco.ws.dto.formulario.ItemChecklistGrupoDTO;
 import ar.com.avaco.ws.dto.repuesto.RepuestoDepositoDTO;
 import ar.com.avaco.ws.rest.controller.AbstractDTORestController;

@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import ar.com.avaco.arc.sec.domain.UserDetailsExtended;
+import ar.com.avaco.fwk.security.domain.UserDetailsExtended;
 
 /**
  * @author avaco

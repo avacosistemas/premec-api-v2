@@ -30,9 +30,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
-import ar.com.avaco.arc.sec.service.UsuarioService;
 import ar.com.avaco.commons.exception.ErrorValidationException;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.utils.BuscarTextoYStripper;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.utils.NumberUtils;

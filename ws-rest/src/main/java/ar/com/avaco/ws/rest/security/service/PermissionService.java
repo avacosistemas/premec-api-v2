@@ -3,7 +3,7 @@
  */
 package ar.com.avaco.ws.rest.security.service;
 
-import ar.com.avaco.arc.sec.domain.Permiso;
+import ar.com.avaco.fwk.security.domain.Permiso;
 import ar.com.avaco.ws.rest.security.dto.Permission;
 import ar.com.avaco.ws.service.ConvertService;
 

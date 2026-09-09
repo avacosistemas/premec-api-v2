@@ -3,8 +3,8 @@
  */
 package ar.com.avaco.ws.rest.security.service;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.commons.exception.ErrorValidationException;
+import ar.com.avaco.fwk.security.domain.Usuario;
 import ar.com.avaco.ws.rest.security.dto.UpdatePasswordDTO;
 import ar.com.avaco.ws.rest.security.dto.User;
 import ar.com.avaco.ws.service.ConvertService;

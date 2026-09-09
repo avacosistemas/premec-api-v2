@@ -1,6 +1,6 @@
 package ar.com.avaco.ws.dto;
 
-import ar.com.avaco.arc.sec.domain.Permiso;
+import ar.com.avaco.fwk.security.domain.Permiso;
 
 public class GrupoPermisoDTO {
 

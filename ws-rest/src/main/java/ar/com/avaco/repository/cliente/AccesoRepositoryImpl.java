@@ -4,8 +4,8 @@ import javax.persistence.EntityManager;
 
 import org.springframework.stereotype.Repository;
 
-import ar.com.avaco.arc.core.component.bean.repository.NJBaseRepository;
-import ar.com.avaco.arc.sec.domain.Acceso;
+import ar.com.avaco.fwk.core.component.bean.repository.NJBaseRepository;
+import ar.com.avaco.fwk.security.domain.Acceso;
 
 /**
  * Repositorio de Accesos

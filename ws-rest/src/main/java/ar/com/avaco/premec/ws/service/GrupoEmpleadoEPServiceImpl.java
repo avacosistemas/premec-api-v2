@@ -9,8 +9,8 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.premec.domain.GrupoEmpleado;
 import ar.com.avaco.premec.dto.GrupoEmpleadoDTO;
 import ar.com.avaco.premec.dto.UsuarioDTO;

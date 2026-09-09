@@ -23,11 +23,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
-import ar.com.avaco.arc.sec.domain.Usuario;
 import ar.com.avaco.commons.exception.ErrorValidationException;
 import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.fwk.core.component.bean.service.NJBaseService;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
+import ar.com.avaco.fwk.security.domain.Usuario;
 import ar.com.avaco.premec.domain.Cliente;
 import ar.com.avaco.premec.repository.ClienteRepository;
 import ar.com.avaco.premec.sap.dto.BusinessPartnerResponseDTO;

@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="CONTACT_US")
 @SequenceGenerator(name = "CONTACT_US_SEQ", sequenceName = "CONTACT_US_SEQ", allocationSize = 1)
-public class ContactUS extends ar.com.avaco.arc.core.domain.Entity<Long> implements Serializable{
+public class ContactUS extends ar.com.avaco.fwk.core.domain.Entity<Long> implements Serializable{
 
 	/**
 	 * 

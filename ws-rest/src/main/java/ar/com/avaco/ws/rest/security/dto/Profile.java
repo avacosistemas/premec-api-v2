@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.com.avaco.arc.core.domain.Entity;
+import ar.com.avaco.fwk.core.domain.Entity;
 
 /**
  * @author avaco

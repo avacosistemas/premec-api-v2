@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import ar.com.avaco.arc.core.domain.filter.ReclamoFilterDTO;
 import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.premec.dto.ReclamoFilterDTO;
 import ar.com.avaco.premec.sap.dto.CustomerReclamoStatsRequestDTO;
 import ar.com.avaco.premec.sap.dto.EstadisticaClienteDTO;
 import ar.com.avaco.premec.sap.dto.EstadisticaMaquinaDTO;

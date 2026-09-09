@@ -21,7 +21,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 @Entity
 @Table(name = "GRUPO_TIPO_ACTIVIDAD")
 @SequenceGenerator(name = "GRUPO_TIPO_ACTIVIDAD_SEQ", sequenceName = "GRUPO_TIPO_ACTIVIDAD_SEQ", allocationSize = 1)
-public class GrupoTipoActividad extends ar.com.avaco.arc.core.domain.Entity<Long> {
+public class GrupoTipoActividad extends ar.com.avaco.fwk.core.domain.Entity<Long> {
 
 	private static final long serialVersionUID = -3260414467249766837L;
 

@@ -24,11 +24,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.LinkedTreeMap;
 
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
-import ar.com.avaco.arc.sec.service.UsuarioService;
 import ar.com.avaco.factory.RestTemplateFactory;
 import ar.com.avaco.factory.RestTemplatePremec;
 import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.ws.dto.repuesto.RepuestoDepositoDTO;
 import ar.com.avaco.ws.service.AbstractSapService;
 import ar.com.avaco.ws.service.RepuestoEPService;

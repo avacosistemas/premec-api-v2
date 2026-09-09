@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "REGISTRO_HORAS_MAQUINA_EX_RES")
 @SequenceGenerator(name = "REGISTRO_HORAS_MAQUINA_EX_RES_SEQ", sequenceName = "REGISTRO_HORAS_MAQUINA_EX_RES_SEQ", allocationSize = 1)
-public class RegistroHorasMaquinaExcedidaReseteo extends ar.com.avaco.arc.core.domain.Entity<Long> {
+public class RegistroHorasMaquinaExcedidaReseteo extends ar.com.avaco.fwk.core.domain.Entity<Long> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REGISTRO_HORAS_MAQUINA_EX_RES_SEQ")

@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 
 @Service(value="jwtUserDetailsService")
 public class JwtUserDetailsService implements UserDetailsService {

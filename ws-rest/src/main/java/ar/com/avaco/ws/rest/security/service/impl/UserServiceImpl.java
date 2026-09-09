@@ -13,11 +13,11 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Acceso;
-import ar.com.avaco.arc.sec.domain.Perfil;
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.UsuarioService;
 import ar.com.avaco.commons.exception.ErrorValidationException;
+import ar.com.avaco.fwk.security.domain.Acceso;
+import ar.com.avaco.fwk.security.domain.Perfil;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.ws.rest.security.dto.Profile;
 import ar.com.avaco.ws.rest.security.dto.UpdatePasswordDTO;
 import ar.com.avaco.ws.rest.security.dto.User;

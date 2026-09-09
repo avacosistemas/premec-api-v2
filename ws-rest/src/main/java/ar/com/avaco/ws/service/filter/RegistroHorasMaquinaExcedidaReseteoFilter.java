@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import ar.com.avaco.arc.core.domain.filter.AbstractFilter;
-import ar.com.avaco.arc.core.domain.filter.FilterData;
-import ar.com.avaco.arc.core.domain.filter.FilterDataType;
+import ar.com.avaco.fwk.core.domain.filter.AbstractFilter;
+import ar.com.avaco.fwk.core.domain.filter.FilterData;
+import ar.com.avaco.fwk.core.domain.filter.FilterDataType;
 
 public class RegistroHorasMaquinaExcedidaReseteoFilter extends AbstractFilter {
 

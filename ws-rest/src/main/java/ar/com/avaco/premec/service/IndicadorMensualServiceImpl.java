@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 import com.ibm.icu.util.Calendar;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.premec.domain.GrupoEmpleado;
 import ar.com.avaco.premec.dto.RegistroInformeMensualEmpleadoDTO;
 import ar.com.avaco.premec.dto.RegistroInformeMensualEmpleadoIndividualDTO;

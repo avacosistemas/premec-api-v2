@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.avaco.arc.sec.domain.Permiso;
-import ar.com.avaco.arc.sec.service.PerfilService;
 import ar.com.avaco.commons.exception.BusinessException;
+import ar.com.avaco.fwk.security.domain.Permiso;
+import ar.com.avaco.fwk.security.service.PerfilService;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
 import ar.com.avaco.ws.rest.security.dto.GrupoPermisoDTO;
 

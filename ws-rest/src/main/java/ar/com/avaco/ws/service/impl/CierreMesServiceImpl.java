@@ -18,8 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ibm.icu.util.Calendar;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.premec.domain.GrupoEmpleado;
 import ar.com.avaco.premec.service.GrupoEmpleadoService;
 import ar.com.avaco.utils.DateUtils;

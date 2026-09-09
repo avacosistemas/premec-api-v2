@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "PARAMETER")
 @SequenceGenerator(name = "PARAMETER_SEQ", sequenceName = "PARAMETER_SEQ", allocationSize = 1)
-public class Parameter extends ar.com.avaco.arc.core.domain.Entity<Integer> implements Serializable {
+public class Parameter extends ar.com.avaco.fwk.core.domain.Entity<Integer> implements Serializable {
 
 	/**
 	 * 

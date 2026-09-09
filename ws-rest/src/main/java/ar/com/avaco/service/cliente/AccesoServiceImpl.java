@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
-import ar.com.avaco.arc.sec.domain.Acceso;
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.fwk.core.component.bean.service.NJBaseService;
+import ar.com.avaco.fwk.security.domain.Acceso;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.repository.cliente.AccesoRepository;
 
 @Transactional

@@ -8,9 +8,9 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
 import ar.com.avaco.commons.repository.RegistroHorasMaquinaExcedidaReseteoRepository;
 import ar.com.avaco.entities.RegistroHorasMaquinaExcedidaReseteo;
+import ar.com.avaco.fwk.core.component.bean.service.NJBaseService;
 
 /**
  * @author avaco

@@ -3,8 +3,8 @@
  */
 package ar.com.avaco.commons.repository;
 
-import ar.com.avaco.arc.core.component.bean.repository.NJRepository;
 import ar.com.avaco.commons.domain.I18n;
+import ar.com.avaco.fwk.core.component.bean.repository.NJRepository;
 
 /**
  * @author avaco

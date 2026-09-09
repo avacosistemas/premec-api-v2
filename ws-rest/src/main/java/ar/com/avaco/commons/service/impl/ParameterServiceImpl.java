@@ -12,7 +12,7 @@ import ar.com.avaco.commons.domain.Parameter;
 import ar.com.avaco.commons.exception.BusinessException;
 import ar.com.avaco.commons.repository.ParameterRepository;
 import ar.com.avaco.commons.service.ParameterService;
-import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
+import ar.com.avaco.fwk.core.component.bean.service.NJBaseService;
 
 /**
  * @author avaco

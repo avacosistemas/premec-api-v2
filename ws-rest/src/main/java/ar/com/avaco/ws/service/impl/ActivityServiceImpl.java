@@ -25,9 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Lists;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.repository.UsuarioRepository;
-import ar.com.avaco.arc.sec.service.impl.UsuarioServiceImpl;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.repository.UsuarioRepository;
+import ar.com.avaco.fwk.security.service.impl.UsuarioServiceImpl;
 import ar.com.avaco.ws.dto.actividad.HorasPorEmpleadoDTO;
 import ar.com.avaco.ws.dto.actividad.RegistroPreviewEmpleadoMensualDTO;
 import ar.com.avaco.ws.dto.employee.liquidacion.FueraConvenio;

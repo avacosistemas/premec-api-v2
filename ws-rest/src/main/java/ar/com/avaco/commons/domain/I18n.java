@@ -27,7 +27,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 @Entity
 @Table(name="I18N")
 @SequenceGenerator(name = "I18N_SEQ", sequenceName = "I18N_SEQ", allocationSize = 1)
-public class I18n extends ar.com.avaco.arc.core.domain.Entity<Long> implements Serializable{
+public class I18n extends ar.com.avaco.fwk.core.domain.Entity<Long> implements Serializable{
 
 	/**
 	 * 

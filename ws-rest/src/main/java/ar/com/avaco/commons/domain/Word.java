@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import ar.com.avaco.arc.core.domain.Entity;
+import ar.com.avaco.fwk.core.domain.Entity;
 
 @javax.persistence.Entity
 @Table(name="WORD")

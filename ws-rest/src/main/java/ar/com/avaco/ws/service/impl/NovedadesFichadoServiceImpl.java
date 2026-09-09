@@ -28,10 +28,10 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.repository.UsuarioRepository;
 import ar.com.avaco.commons.exception.ErrorValidationException;
 import ar.com.avaco.factory.SapBusinessException;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.repository.UsuarioRepository;
 import ar.com.avaco.utils.DateUtils;
 import ar.com.avaco.ws.dto.actividad.HorasPorEmpleadoDTO;
 import ar.com.avaco.ws.dto.employee.EmployeesInfoReponseSapDTO;

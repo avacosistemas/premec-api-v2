@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
+import ar.com.avaco.fwk.security.domain.Usuario;
 import ar.com.avaco.ws.rest.security.dto.JwtAuthenticationRequest;
 import ar.com.avaco.ws.rest.security.dto.JwtAuthenticationResponse;
 import ar.com.avaco.ws.rest.security.dto.User;

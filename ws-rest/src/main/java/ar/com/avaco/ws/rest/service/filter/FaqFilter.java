@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ar.com.avaco.arc.core.domain.filter.AbstractFilter;
-import ar.com.avaco.arc.core.domain.filter.FilterData;
-import ar.com.avaco.arc.core.domain.filter.FilterDataType;
+import ar.com.avaco.fwk.core.domain.filter.AbstractFilter;
+import ar.com.avaco.fwk.core.domain.filter.FilterData;
+import ar.com.avaco.fwk.core.domain.filter.FilterDataType;
 
 /**
  * @author avaco

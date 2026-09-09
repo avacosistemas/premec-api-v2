@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
 import ar.com.avaco.ws.dto.employee.liquidacion.FueraConvenio;
 import ar.com.avaco.ws.dto.employee.liquidacion.Jornal;
 import ar.com.avaco.ws.dto.employee.liquidacion.Mensual;

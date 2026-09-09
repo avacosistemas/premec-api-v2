@@ -36,6 +36,6 @@
 		</beans:property>
 	</beans:bean>    
 	
-	<beans:bean id="mailSenderSMTPService" class="ar.com.avaco.arc.core.service.MailSenderSMTPServiceImpl"></beans:bean>
+	<beans:bean id="mailSenderSMTPService" class="ar.com.avaco.fwk.core.service.MailSenderSMTPServiceImpl"></beans:bean>
 	
 </beans:beans>

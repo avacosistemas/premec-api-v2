@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "FAQ")
 @SequenceGenerator(name = "FAQ_SEQ", sequenceName = "FAQ_SEQ", allocationSize = 1)
-public class Faq extends ar.com.avaco.arc.core.domain.Entity<Long> implements Serializable {
+public class Faq extends ar.com.avaco.fwk.core.domain.Entity<Long> implements Serializable {
 
 	public static final String CATEGORY_PRESTAMOS = "prestamos";
 	public static final String CATEGORY_LEGALES = "legales";

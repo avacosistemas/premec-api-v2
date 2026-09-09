@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import ar.com.avaco.arc.core.component.bean.service.NJService;
-import ar.com.avaco.arc.core.domain.Entity;
-import ar.com.avaco.arc.core.domain.filter.AbstractFilter;
+import ar.com.avaco.fwk.core.component.bean.service.NJService;
+import ar.com.avaco.fwk.core.domain.Entity;
+import ar.com.avaco.fwk.core.domain.filter.AbstractFilter;
 import ar.com.avaco.ws.rest.dto.DTOEntity;
 
 /**

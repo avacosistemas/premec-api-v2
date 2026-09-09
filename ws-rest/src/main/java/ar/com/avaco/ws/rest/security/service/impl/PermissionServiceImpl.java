@@ -8,8 +8,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Permiso;
-import ar.com.avaco.arc.sec.service.PermisoService;
+import ar.com.avaco.fwk.security.domain.Permiso;
+import ar.com.avaco.fwk.security.service.PermisoService;
 import ar.com.avaco.ws.rest.security.dto.Permission;
 import ar.com.avaco.ws.rest.security.service.PermissionService;
 import ar.com.avaco.ws.service.AbstractConvertService;

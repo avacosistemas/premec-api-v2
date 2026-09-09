@@ -5,8 +5,8 @@ package ar.com.avaco.commons.repository;
 
 import java.util.List;
 
-import ar.com.avaco.arc.core.component.bean.repository.NJRepository;
 import ar.com.avaco.commons.domain.Faq;
+import ar.com.avaco.fwk.core.component.bean.repository.NJRepository;
 
 /**
  * @author avaco

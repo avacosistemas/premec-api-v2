@@ -18,8 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClientException;
 
-import ar.com.avaco.model.PostLoginSAPDTO;
-import ar.com.avaco.model.ResponseLoginSAPDTO;
+import ar.com.avaco.premec.dto.PostLoginSAPDTO;
+import ar.com.avaco.premec.dto.ResponseLoginSAPDTO;
 
 public class RestTemplateFactory {
 

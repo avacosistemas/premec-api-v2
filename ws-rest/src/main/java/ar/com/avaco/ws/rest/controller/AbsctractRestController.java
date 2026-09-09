@@ -12,9 +12,9 @@ import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import ar.com.avaco.arc.core.component.bean.service.NJService;
-import ar.com.avaco.arc.core.domain.Entity;
 import ar.com.avaco.commons.exception.BusinessException;
+import ar.com.avaco.fwk.core.component.bean.service.NJService;
+import ar.com.avaco.fwk.core.domain.Entity;
 import ar.com.avaco.ws.rest.dto.ErrorResponse;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
 import ar.com.avaco.ws.service.FunctionBusiness;

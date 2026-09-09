@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "TIPO_PROBLEMA_MAQUINA")
 @SequenceGenerator(name = "TIPO_PROBLEMA_MAQUINA_SEQ", sequenceName = "TIPO_PROBLEMA_MAQUINA_SEQ", allocationSize = 1)
-public class TipoProblemaMaquina extends ar.com.avaco.arc.core.domain.Entity<Long> {
+public class TipoProblemaMaquina extends ar.com.avaco.fwk.core.domain.Entity<Long> {
 
 	private static final long serialVersionUID = 2476967267656599606L;
 

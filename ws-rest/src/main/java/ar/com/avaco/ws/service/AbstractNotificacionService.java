@@ -10,7 +10,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.beans.factory.annotation.Value;
 
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
 
 public abstract class AbstractNotificacionService {
 

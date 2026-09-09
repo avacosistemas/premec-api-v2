@@ -8,7 +8,7 @@ import javax.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 import ar.com.avaco.commons.domain.Parameter;
-import ar.com.avaco.arc.core.component.bean.repository.NJBaseRepository;
+import ar.com.avaco.fwk.core.component.bean.repository.NJBaseRepository;
 
 /**
  * 

@@ -5,8 +5,8 @@ package ar.com.avaco.commons.service;
 
 import java.util.List;
 
-import ar.com.avaco.arc.core.component.bean.service.NJService;
 import ar.com.avaco.commons.domain.Faq;
+import ar.com.avaco.fwk.core.component.bean.service.NJService;
 
 /**
  * 

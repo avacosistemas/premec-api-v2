@@ -18,11 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
 import ar.com.avaco.commons.domain.ContactUS;
 import ar.com.avaco.commons.repository.ContactUSRepository;
 import ar.com.avaco.commons.service.ContactUSService;
+import ar.com.avaco.fwk.core.component.bean.service.NJBaseService;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
 
 /**
  * @author avaco

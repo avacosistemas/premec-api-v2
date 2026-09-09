@@ -11,11 +11,11 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import ar.com.avaco.arc.sec.domain.Acceso;
-import ar.com.avaco.arc.sec.domain.Perfil;
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.arc.sec.service.PerfilService;
-import ar.com.avaco.arc.sec.service.UsuarioService;
+import ar.com.avaco.fwk.security.domain.Acceso;
+import ar.com.avaco.fwk.security.domain.Perfil;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.service.PerfilService;
+import ar.com.avaco.fwk.security.service.UsuarioService;
 import ar.com.avaco.service.cliente.AccesoService;
 import ar.com.avaco.ws.rest.security.dto.AccesoDTO;
 import ar.com.avaco.ws.rest.security.service.AccesoEPService;

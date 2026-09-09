@@ -71,7 +71,7 @@
 			value="myPersistenceUnit" />
 		<beans:property name="packagesToScan">
 			<beans:array>
-				<beans:value>ar.com.avaco.arc.sec.domain</beans:value>
+				<beans:value>ar.com.avaco.fwk.security.domain</beans:value>
 				<beans:value>ar.com.avaco.commons.domain</beans:value>
 				<beans:value>ar.com.avaco</beans:value>
 			</beans:array>
@@ -88,7 +88,7 @@
 		<beans:property name="jpaProperties">
 			<beans:props>
 				<beans:prop key="hibernate.current_session_context_class">
-					ar.com.avaco.arc.core.jpa.configuration.EntityManagerSessionUnwrapper
+					ar.com.avaco.fwk.core.jpa.configuration.EntityManagerSessionUnwrapper
 				</beans:prop>
 				<beans:prop key="javax.persistence.jdbc.driver">#{dataSourceMap['DB_DRIVERCLASSNAME']}
 				</beans:prop>

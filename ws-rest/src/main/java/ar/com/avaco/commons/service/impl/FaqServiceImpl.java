@@ -10,10 +10,10 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ar.com.avaco.arc.core.component.bean.service.NJBaseService;
 import ar.com.avaco.commons.domain.Faq;
 import ar.com.avaco.commons.repository.FaqRepository;
 import ar.com.avaco.commons.service.FaqService;
+import ar.com.avaco.fwk.core.component.bean.service.NJBaseService;
 
 /**
  * @author avaco

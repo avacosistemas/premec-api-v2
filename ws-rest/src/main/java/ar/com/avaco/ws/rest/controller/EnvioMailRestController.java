@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.avaco.arc.core.service.MailSenderSMTPService;
+import ar.com.avaco.fwk.core.service.MailSenderSMTPService;
 import ar.com.avaco.ws.rest.dto.JSONResponse;
 
 @RestController

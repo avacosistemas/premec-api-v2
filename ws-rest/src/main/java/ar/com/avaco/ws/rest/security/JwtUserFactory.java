@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
-import ar.com.avaco.model.JwtUser;
+import ar.com.avaco.fwk.security.domain.Usuario;
+import ar.com.avaco.fwk.security.model.JwtUser;
 
 public final class JwtUserFactory {
 

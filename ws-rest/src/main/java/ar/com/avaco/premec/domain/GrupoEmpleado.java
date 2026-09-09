@@ -18,12 +18,12 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import ar.com.avaco.arc.sec.domain.Usuario;
+import ar.com.avaco.fwk.security.domain.Usuario;
 
 @Entity
 @Table(name = "GRUPO_EMPLEADO")
 @SequenceGenerator(name = "GRUPO_EMPLEADO_SEQ", sequenceName = "GRUPO_EMPLEADO_SEQ", allocationSize = 1)
-public class GrupoEmpleado extends ar.com.avaco.arc.core.domain.Entity<Long> {
+public class GrupoEmpleado extends ar.com.avaco.fwk.core.domain.Entity<Long> {
 
 	private static final long serialVersionUID = 4015134588869901551L;
 	@Id

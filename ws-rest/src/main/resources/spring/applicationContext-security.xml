@@ -92,9 +92,9 @@
 	<ctx:component-scan
 		base-package="ar.com.avaco.ws.rest.security.handler" />
 	<ctx:component-scan
-		base-package="ar.com.avaco.arc.sec.repository.impl" />
+		base-package="ar.com.avaco.fwk.security.repository.impl" />
 	<ctx:component-scan
-		base-package="ar.com.avaco.arc.sec.service.impl" />
+		base-package="ar.com.avaco.fwk.security.service.impl" />
 	<ctx:component-scan
 		base-package="ar.com.avaco.ws.rest.security.service.impl" />
 

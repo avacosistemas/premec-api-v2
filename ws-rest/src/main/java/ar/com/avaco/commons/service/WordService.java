@@ -3,8 +3,8 @@
  */
 package ar.com.avaco.commons.service;
 
-import ar.com.avaco.arc.core.component.bean.service.NJService;
 import ar.com.avaco.commons.domain.Word;
+import ar.com.avaco.fwk.core.component.bean.service.NJService;
 
 
 /**

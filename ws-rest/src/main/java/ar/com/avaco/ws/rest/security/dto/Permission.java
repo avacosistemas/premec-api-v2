@@ -5,7 +5,7 @@ package ar.com.avaco.ws.rest.security.dto;
 
 import java.io.Serializable;
 
-import ar.com.avaco.arc.core.domain.Entity;
+import ar.com.avaco.fwk.core.domain.Entity;
 
 /**
  * @author avaco
